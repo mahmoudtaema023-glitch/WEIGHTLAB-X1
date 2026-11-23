@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>WEIGHTLAB X1 | 3D Model Builder</title>
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"}}</script>
+<style>
+:root{color-scheme:dark;--bg:#08111f;--panel:#101e31;--line:#29425f;--cyan:#5de1e6;--text:#edf4ff;--muted:#9db0c8}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at 50% -10%,#1c4262,transparent 45%),var(--bg);color:var(--text);font:15px/1.5 system-ui,Arial,sans-serif}
+header{padding:18px max(18px,calc((100% - 1180px)/2));border-bottom:1px solid #ffffff18;display:flex;justify-content:space-between;align-items:center;gap:12px}
+.brand{font-weight:850;letter-spacing:.12em}.brand span{color:var(--cyan)}a{color:var(--cyan);text-decoration:none}
+main{max-width:1180px;margin:auto;padding:30px 18px}.intro{margin-bottom:22px}.eyebrow{color:var(--cyan);font-size:11px;font-weight:800;letter-spacing:.18em}.intro h1{font-size:clamp(30px,5vw,48px);line-height:1.08;margin:8px 0}.intro p{color:var(--muted);max-width:720px}
+.layout{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(260px,.8fr);gap:16px}
+.viewer{position:relative;min-height:460px;border:1px solid var(--line);border-radius:16px;overflow:hidden;background:radial-gradient(ellipse at 50% 35%,#183653,#07111e 72%)}
+canvas{display:block;width:100%;height:460px;touch-action:none}.hint{position:absolute;bottom:12px;left:12px;background:#07111ecc;color:var(--muted);padding:6px 9px;border-radius:7px;font-size:11px;pointer-events:none}
+.panel{background:linear-gradient(145deg,#12233a,#0e1b2d);border:1px solid var(--line);border-radius:15px;padding:18px}.panel h2{font-size:17px;margin:0 0 12px}
+.row{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0}.btn{background:#14263d;color:var(--text);border:1px solid #35516d;padding:10px 12px;border-radius:8px;cursor:pointer;font:inherit;font-size:12px}.btn.primary{background:var(--cyan);color:#07131d;border-color:var(--cyan);font-weight:800}
+label{display:block;margin:14px 0;color:var(--muted);font-size:12px}input,select{display:block;width:100%;margin-top:7px}select{background:#0b1828;color:var(--text);border:1px solid var(--line);padding:10px;border-radius:8px}input[type=range]{accent-color:var(--cyan)}input[type=color]{height:38px;background:none;border:0}
+#status{color:#8be0b0;font-size:12px;min-height:22px;margin-top:8px}.note{color:var(--muted);font-size:11px}
+@media(max-width:760px){.layout{grid-template-columns:1fr}.viewer{min-height:340px}canvas{height:340px}header{align-items:flex-start;flex-direction:column}}
+</style>
+</head>
+<body>
+<header><div class="brand">WEIGHTLAB <span>X1</span> / 3D WORKSHOP</div><a href="./">← Back to main website</a></header>
+<main>
+<div class="intro"><div class="eyebrow">INTERACTIVE DESIGN STUDIO</div><h1>Build your own scale concept.</h1><p>Add parts, change their size and color, and rotate the model to inspect it. This is a visual concept builder, not an engineering simulator or validated CAD tool.</p></div>
+<div class="layout">
+<div class="viewer"><canvas id="view" aria-label="Interactive 3D model preview"></canvas><div class="hint">Drag to rotate · Pinch or scroll to zoom</div></div>
+<aside class="panel">
+<h2>Build components</h2>
+<div class="row"><button class="btn primary" id="platform">＋ Platform</button><button class="btn" id="frame">＋ Frame</button></div>
+<div class="row"><button class="btn" id="spring">＋ Spring</button><button class="btn" id="sensor">＋ Sensor</button></div>
+<label>Selected component<select id="selected"><option value="">Select a component</option></select></label>
+<label>Component size<input id="size" type="range" min=".4" max="2.5" step=".1" value="1"></label>
+<label>Height / position<input id="height" type="range" min="0" max="4" step=".1" value="1"></label>
+<label>Color<input id="color" type="color" value="#5de1e6"></label>
+<div class="row"><button class="btn" id="delete">Delete selected</button><button class="btn" id="reset">Reset model</button></div>
+<div class="row"><button class="btn primary" id="save">Save design</button><button class="btn" id="export">Export PNG</button></div>
+<div id="status">Ready. Add your first component.</div>
+<p class="note">Saved designs stay in this browser on this device. PNG export saves an image of the current model.</p>
+</aside>
+</div>
+<p class="note">Concept geometry is illustrative. Before building a physical scale, check clearances, material strength, stability, calibration, and competition rules.</p>
+</main>
+<script type="module">
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+const canvas=document.getElementById('view'),status=document.getElementById('status');window.addEventListener('error',e=>{status.textContent='3D startup error: '+(e.message||'Check browser support and internet connection.');});window.addEventListener('unhandledrejection',e=>{status.textContent='3D startup error: '+(e.reason?.message||'Could not load the 3D library.');});
+const scene=new THREE.Scene();scene.background=new THREE.Color('#081522');
+const camera=new THREE.PerspectiveCamera(45,1,.1,100);camera.position.set(7,6,9);
+const renderer=new THREE.WebGLRenderer({canvas,antialias:true,preserveDrawingBuffer:true});renderer.setPixelRatio(Math.min(devicePixelRatio,2));
+const controls=new OrbitControls(camera,canvas);controls.enableDamping=true;controls.target.set(0,1,0);
+scene.add(new THREE.HemisphereLight(0xc9eaff,0x243044,2));
+const light=new THREE.DirectionalLight(0xffffff,2.2);light.position.set(5,9,6);scene.add(light);
+scene.add(new THREE.GridHelper(12,24,0x31516d,0x1c3047));
+const ground=new THREE.Mesh(new THREE.PlaneGeometry(30,30),new THREE.MeshStandardMaterial({color:0x081522,roughness:1}));ground.rotation.x=-Math.PI/2;ground.position.y=-.03;scene.add(ground);
+let parts=[],selected=null,nextId=1;
+const material=c=>new THREE.MeshStandardMaterial({color:c,metalness:.25,roughness:.55});
+function refresh(){const s=document.getElementById('selected');s.innerHTML='<option value="">Select a component</option>';parts.forEach(p=>{const o=document.createElement('option');o.value=p.userData.id;o.textContent=p.userData.type+' #'+p.userData.id;s.append(o)});if(selected)s.value=selected.userData.id}
+function choose(p){selected=p;refresh();if(p){document.getElementById('size').value=p.userData.size;document.getElementById('height').value=p.position.y;document.getElementById('color').value=p.userData.color}}
+function add(type){const g=new THREE.Group(),c='#5de1e6',m=material(c);g.userData={id:nextId++,type,size:1,color:c};
+const box=(w,h,d,x,y,z)=>{const o=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),m.clone());o.position.set(x,y,z);o.castShadow=true;g.add(o)};
+if(type==='Platform'){box(3,.22,3,0,0,0);g.position.y=2}
+if(type==='Frame'){box(.18,3,.18,-1.45,1.5,-1.45);box(.18,3,.18,1.45,1.5,-1.45);box(.18,3,.18,-1.45,1.5,1.45);box(.18,3,.18,1.45,1.5,1.45);box(3.1,.18,.18,0,3,-1.45);box(3.1,.18,.18,0,3,1.45)}
+if(type==='Spring'){const core=new THREE.Mesh(new THREE.CylinderGeometry(.32,.32,1.5,16,16,true),m);core.position.y=.75;g.add(core);for(let i=0;i<7;i++){const ring=new THREE.Mesh(new THREE.TorusGeometry(.32,.035,6,24),m.clone());ring.rotation.x=Math.PI/2;ring.position.y=.12+i*.19;g.add(ring)}g.position.y=.1}
+if(type==='Sensor'){const o=new THREE.Mesh(new THREE.BoxGeometry(.65,.42,.45),m);o.position.y=.21;g.add(o);g.position.set(0,.15,1.1)}
+scene.add(g);parts.push(g);choose(g);status.textContent=type+' added.'}
+document.getElementById('platform').onclick=()=>add('Platform');document.getElementById('frame').onclick=()=>add('Frame');document.getElementById('spring').onclick=()=>add('Spring');document.getElementById('sensor').onclick=()=>add('Sensor');
+document.getElementById('selected').onchange=e=>choose(parts.find(p=>String(p.userData.id)===e.target.value)||null);
+document.getElementById('size').oninput=e=>{if(selected){const v=+e.target.value;selected.scale.setScalar(v);selected.userData.size=v}};
+document.getElementById('height').oninput=e=>{if(selected)selected.position.y=+e.target.value};
+document.getElementById('color').oninput=e=>{if(selected){selected.userData.color=e.target.value;selected.traverse(o=>{if(o.isMesh)o.material.color.set(e.target.value)})}};
+document.getElementById('delete').onclick=()=>{if(!selected)return;scene.remove(selected);parts=parts.filter(p=>p!==selected);selected=null;refresh();status.textContent='Component deleted.'};
+document.getElementById('reset').onclick=()=>{parts.forEach(p=>scene.remove(p));parts=[];selected=null;nextId=1;refresh();status.textContent='Model reset.'};
+document.getElementById('save').onclick=()=>{try{localStorage.setItem('weightlab-x1-model',JSON.stringify(parts.map(p=>({type:p.userData.type,id:p.userData.id,size:p.userData.size,color:p.userData.color,x:p.position.x,y:p.position.y,z:p.position.z}))));status.textContent='Design saved in this browser.'}catch(e){status.textContent='Could not save in this browser.'}};
+document.getElementById('export').onclick=()=>{renderer.render(scene,camera);const a=document.createElement('a');a.download='weightlab-x1-model.png';a.href=renderer.domElement.toDataURL('image/png');a.click();status.textContent='PNG export started.'};
+function resize(){const w=canvas.clientWidth,h=canvas.clientHeight;if(!w||!h)return;renderer.setSize(w,h,false);camera.aspect=w/h;camera.updateProjectionMatrix()}
+new ResizeObserver(resize).observe(canvas);resize();
+function animate(){requestAnimationFrame(animate);controls.update();renderer.render(scene,camera)}animate();
+</script>
+</body>
+</html>
