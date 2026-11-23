@@ -1,56 +1,524 @@
+
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" dir="ltr">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="theme-color" content="#07111f">
 <meta name="description" content="WEIGHTLAB X1 engineering workspace for weighing-scale design, simulation, testing and research.">
 <title>WEIGHTLAB X1 | Engineering Workspace</title>
+
 <style>
-:root{--bg:#07111f;--panel:#0d1b2d;--panel2:#11243a;--line:#203750;--text:#edf5ff;--muted:#9eb1c8;--cyan:#60e5e8;--blue:#82aaff;--green:#8be0b0;--amber:#ffd18a}
-*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:radial-gradient(ellipse at 78% -10%,#164568 0,transparent 34%),var(--bg);color:var(--text);font:15px/1.6 Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}a{color:inherit;text-decoration:none}.wrap{width:min(1160px,calc(100% - 36px));margin:auto}
-header{position:sticky;top:0;z-index:5;background:#07111feF;border-bottom:1px solid #ffffff14;backdrop-filter:blur(14px)}.nav{height:72px;display:flex;align-items:center;justify-content:space-between;gap:18px}.brand{display:flex;align-items:center;gap:11px;font-weight:850;letter-spacing:.13em;font-size:13px}.logo{width:38px;height:38px;display:grid;place-items:center;border:1px solid #60e5e866;border-radius:12px;color:var(--cyan);font-size:20px;background:#60e5e811}.navlinks{display:flex;gap:22px;align-items:center;color:var(--muted);font-size:12px}.navlinks a:hover{color:var(--cyan)}.navcta{padding:9px 14px;border:1px solid #60e5e866;border-radius:9px;color:var(--cyan)}
-.hero{padding:76px 0 58px;display:grid;grid-template-columns:1.1fr .9fr;gap:45px;align-items:center}.eyebrow,.kicker{color:var(--cyan);font-size:10px;letter-spacing:.2em;text-transform:uppercase;font-weight:850}.hero h1{font-size:clamp(42px,6vw,70px);line-height:1.02;letter-spacing:-.055em;margin:15px 0 18px}.hero h1 span{color:var(--cyan)}.lead{max-width:620px;color:#b7c8da;font-size:17px}.actions{display:flex;gap:11px;flex-wrap:wrap;margin-top:25px}.btn{display:inline-flex;align-items:center;justify-content:center;padding:12px 17px;border-radius:9px;background:var(--cyan);color:#06131e;font-weight:800;font-size:12px;border:1px solid var(--cyan)}.btn.secondary{background:transparent;color:var(--text);border-color:var(--line)}.visual{padding:20px;border:1px solid #60e5e83d;border-radius:20px;background:linear-gradient(145deg,#142d48,#0b192a);box-shadow:0 25px 70px #0005}.display{background:#06101a;border:1px solid #34516c;border-radius:13px;padding:20px}.displaytop{display:flex;justify-content:space-between;color:var(--muted);font-size:9px;letter-spacing:.15em}.digits{font:500 clamp(40px,5vw,58px)/1.2 ui-monospace,monospace;color:var(--green);margin:24px 0 3px}.sub{font-size:11px;color:var(--muted)}.bar{height:5px;border-radius:8px;background:#1c3047;margin:20px 0 12px;overflow:hidden}.bar span{display:block;width:64%;height:100%;background:linear-gradient(90deg,var(--cyan),var(--green))}.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin-top:12px}.stat{background:#ffffff08;border:1px solid #ffffff12;padding:11px;border-radius:10px}.stat b{display:block;font-size:16px}.stat small{font-size:9px;color:var(--muted)}
-section{padding:58px 0;border-top:1px solid #ffffff10}.head{max-width:720px;margin-bottom:26px}.head h2{font-size:clamp(27px,4vw,39px);line-height:1.1;letter-spacing:-.04em;margin:9px 0}.head p{color:var(--muted);margin:0}.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}.card{background:linear-gradient(145deg,#11243a,#0b192a);border:1px solid var(--line);border-radius:14px;padding:19px;transition:.2s;min-height:175px}.card:hover{transform:translateY(-3px);border-color:#60e5e877}.icon{width:39px;height:39px;border-radius:11px;display:grid;place-items:center;background:#60e5e814;border:1px solid #60e5e833;color:var(--cyan);font-size:18px;margin-bottom:13px}.card h3{font-size:16px;margin:0 0 6px}.card p{font-size:12px;color:var(--muted);margin:0 0 14px}.link{color:var(--cyan);font-size:11px;font-weight:800}.label{display:inline-block;font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--green);border:1px solid #8be0b055;padding:3px 7px;border-radius:30px;margin-bottom:10px}.split{display:grid;grid-template-columns:1fr 1fr;gap:14px}.feature{background:#ffffff06;border:1px solid var(--line);border-radius:14px;padding:20px}.feature h3{margin:0 0 7px}.feature p{color:var(--muted);font-size:13px;margin:0}.notice{margin-top:18px;border:1px solid #ffd18a55;background:#ffd18a0b;border-radius:12px;padding:15px 17px;color:#e6d6bb;font-size:12px}.notice strong{color:var(--amber)}footer{padding:28px 0 42px;border-top:1px solid #ffffff12;color:var(--muted);font-size:10px}.foot{display:flex;justify-content:space-between;gap:15px;flex-wrap:wrap}
-@media(max-width:820px){.hero{grid-template-columns:1fr;gap:25px;padding-top:52px}.grid{grid-template-columns:repeat(2,1fr)}.navlinks a:not(.navcta){display:none}}
-@media(max-width:560px){.wrap{width:calc(100% - 28px)}.grid,.split{grid-template-columns:1fr}.nav{height:62px}.hero{padding:44px 0}.card{min-height:0}.stats{grid-template-columns:repeat(3,1fr)}}
+:root{
+--bg:#07111f;--panel:#0d1b2d;--panel2:#11243a;
+--line:#203750;--text:#edf5ff;--muted:#9eb1c8;
+--cyan:#60e5e8;--blue:#82aaff;--green:#8be0b0;--amber:#ffd18a
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+margin:0;
+background:radial-gradient(ellipse at 78% -10%,#164568 0,transparent 34%),var(--bg);
+color:var(--text);
+font:15px/1.6 Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif
+}
+a{color:inherit;text-decoration:none}
+.wrap{width:min(1160px,calc(100% - 36px));margin:auto}
+
+header{
+position:sticky;top:0;z-index:5;
+background:#07111feF;
+border-bottom:1px solid #ffffff14;
+backdrop-filter:blur(14px)
+}
+.nav{
+height:72px;display:flex;align-items:center;
+justify-content:space-between;gap:18px
+}
+.brand{
+display:flex;align-items:center;gap:11px;
+font-weight:850;letter-spacing:.13em;font-size:13px
+}
+.logo{
+width:38px;height:38px;display:grid;place-items:center;
+border:1px solid #60e5e866;border-radius:12px;
+color:var(--cyan);font-size:20px;background:#60e5e811
+}
+.navlinks{
+display:flex;gap:18px;align-items:center;
+color:var(--muted);font-size:12px
+}
+.navlinks a:hover{color:var(--cyan)}
+.navcta{
+padding:9px 14px;border:1px solid #60e5e866;
+border-radius:9px;color:var(--cyan)
+}
+.settings-btn{
+padding:9px 12px;border:1px solid var(--line);
+border-radius:9px;background:#ffffff08;
+color:var(--text);font:inherit;font-size:12px;cursor:pointer
+}
+.settings-btn:hover{border-color:var(--cyan);color:var(--cyan)}
+
+.hero{
+padding:76px 0 58px;
+display:grid;grid-template-columns:1.1fr .9fr;
+gap:45px;align-items:center
+}
+.eyebrow,.kicker{
+color:var(--cyan);font-size:10px;
+letter-spacing:.2em;text-transform:uppercase;font-weight:850
+}
+.hero h1{
+font-size:clamp(42px,6vw,70px);
+line-height:1.02;letter-spacing:-.055em;margin:15px 0 18px
+}
+.hero h1 span{color:var(--cyan)}
+.lead{max-width:620px;color:#b7c8da;font-size:17px}
+.actions{display:flex;gap:11px;flex-wrap:wrap;margin-top:25px}
+.btn{
+display:inline-flex;align-items:center;justify-content:center;
+padding:12px 17px;border-radius:9px;background:var(--cyan);
+color:#06131e;font-weight:800;font-size:12px;border:1px solid var(--cyan)
+}
+.btn.secondary{background:transparent;color:var(--text);border-color:var(--line)}
+.visual{
+padding:20px;border:1px solid #60e5e83d;border-radius:20px;
+background:linear-gradient(145deg,#142d48,#0b192a);
+box-shadow:0 25px 70px #0005
+}
+.display{background:#06101a;border:1px solid #34516c;border-radius:13px;padding:20px}
+.displaytop{
+display:flex;justify-content:space-between;
+color:var(--muted);font-size:9px;letter-spacing:.15em
+}
+.digits{
+font:500 clamp(40px,5vw,58px)/1.2 ui-monospace,monospace;
+color:var(--green);margin:24px 0 3px
+}
+.sub{font-size:11px;color:var(--muted)}
+.bar{height:5px;border-radius:8px;background:#1c3047;margin:20px 0 12px;overflow:hidden}
+.bar span{
+display:block;width:64%;height:100%;
+background:linear-gradient(90deg,var(--cyan),var(--green))
+}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin-top:12px}
+.stat{background:#ffffff08;border:1px solid #ffffff12;padding:11px;border-radius:10px}
+.stat b{display:block;font-size:16px}
+.stat small{font-size:9px;color:var(--muted)}
+
+section{padding:58px 0;border-top:1px solid #ffffff10}
+.head{max-width:720px;margin-bottom:26px}
+.head h2{
+font-size:clamp(27px,4vw,39px);
+line-height:1.1;letter-spacing:-.04em;margin:9px 0
+}
+.head p{color:var(--muted);margin:0}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.card{
+background:linear-gradient(145deg,#11243a,#0b192a);
+border:1px solid var(--line);border-radius:14px;
+padding:19px;transition:.2s;min-height:175px
+}
+.card:hover{transform:translateY(-3px);border-color:#60e5e877}
+.icon{
+width:39px;height:39px;border-radius:11px;
+display:grid;place-items:center;background:#60e5e814;
+border:1px solid #60e5e833;color:var(--cyan);
+font-size:18px;margin-bottom:13px
+}
+.card h3{font-size:16px;margin:0 0 6px}
+.card p{font-size:12px;color:var(--muted);margin:0 0 14px}
+.link{color:var(--cyan);font-size:11px;font-weight:800}
+.label{
+display:inline-block;font-size:9px;letter-spacing:.1em;
+text-transform:uppercase;color:var(--green);
+border:1px solid #8be0b055;padding:3px 7px;
+border-radius:30px;margin-bottom:10px
+}
+.split{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.feature{
+background:#ffffff06;border:1px solid var(--line);
+border-radius:14px;padding:20px
+}
+.feature h3{margin:0 0 7px}
+.feature p{color:var(--muted);font-size:13px;margin:0}
+.notice{
+margin-top:18px;border:1px solid #ffd18a55;
+background:#ffd18a0b;border-radius:12px;
+padding:15px 17px;color:#e6d6bb;font-size:12px
+}
+.notice strong{color:var(--amber)}
+footer{
+padding:28px 0 42px;border-top:1px solid #ffffff12;
+color:var(--muted);font-size:10px
+}
+.foot{display:flex;justify-content:space-between;gap:15px;flex-wrap:wrap}
+
+/* SETTINGS WINDOW */
+.settings-overlay{
+position:fixed;inset:0;background:#0009;z-index:20;
+display:none;align-items:center;justify-content:center;padding:18px
+}
+.settings-overlay.open{display:flex}
+.settings-panel{
+width:min(420px,100%);background:#0d1b2d;
+border:1px solid #34516c;border-radius:18px;
+padding:22px;box-shadow:0 25px 80px #0009
+}
+.settings-head{
+display:flex;align-items:center;justify-content:space-between;
+gap:12px;margin-bottom:8px
+}
+.settings-head h2{font-size:21px;margin:0}
+.close-btn{
+background:transparent;border:1px solid var(--line);
+color:var(--text);border-radius:8px;padding:5px 10px;
+font-size:18px;cursor:pointer
+}
+.settings-panel p{color:var(--muted);font-size:13px;margin:4px 0 18px}
+.language-options{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.language-option{
+border:1px solid var(--line);background:#ffffff08;
+color:var(--text);padding:13px;border-radius:10px;
+font:inherit;cursor:pointer
+}
+.language-option.active{
+border-color:var(--cyan);background:#60e5e817;color:var(--cyan)
+}
+.language-option small{
+display:block;color:var(--muted);font-size:10px;margin-top:3px
+}
+
+/* ARABIC RIGHT-TO-LEFT LAYOUT */
+html[dir="rtl"] body{font-family:Tahoma,Arial,sans-serif}
+html[dir="rtl"] .hero,
+html[dir="rtl"] section,
+html[dir="rtl"] footer{direction:rtl}
+html[dir="rtl"] .hero h1{letter-spacing:0;line-height:1.2}
+html[dir="rtl"] .eyebrow,
+html[dir="rtl"] .kicker{letter-spacing:0}
+html[dir="rtl"] .label{letter-spacing:0}
+html[dir="rtl"] .displaytop,
+html[dir="rtl"] .digits,
+html[dir="rtl"] .stats{direction:ltr}
+html[dir="rtl"] .navlinks{direction:rtl}
+html[dir="rtl"] .brand{direction:ltr}
+html[dir="rtl"] .foot{direction:rtl}
+
+@media(max-width:820px){
+.hero{grid-template-columns:1fr;gap:25px;padding-top:52px}
+.grid{grid-template-columns:repeat(2,1fr)}
+.navlinks a:not(.navcta){display:none}
+}
+@media(max-width:560px){
+.wrap{width:calc(100% - 28px)}
+.grid,.split{grid-template-columns:1fr}
+.nav{height:62px}
+.hero{padding:44px 0}
+.card{min-height:0}
+.stats{grid-template-columns:repeat(3,1fr)}
+.navlinks{gap:8px}
+.navcta{display:none}
+.settings-btn{padding:8px 9px}
+}
 </style>
 </head>
+
 <body>
-<header><div class="wrap nav">
-<a class="brand" href="#top"><span class="logo">W</span><span>WEIGHTLAB <span style="color:var(--cyan)">X1</span></span></a>
-<nav class="navlinks"><a href="#workspace">Workspace</a><a href="#research">Research</a><a href="#workflow">Workflow</a><a class="navcta" href="#workspace">Open tools ↗</a></nav>
-</div></header>
-<main id="top">
-<div class="wrap hero">
-<div><div class="eyebrow">Student engineering platform · 2026</div>
-<h1>Design. Test.<br><span>Understand weight.</span></h1>
-<p class="lead">A digital engineering workspace for exploring weighing-scale concepts, building 3D designs, simulating sensor behaviour, and documenting experiments across a target range of 100–1,000 grams.</p>
-<div class="actions"><a class="btn" href="#workspace">Explore the workspace ↓</a><a class="btn secondary" href="research_library.html#sensors">Open research library ↗</a></div></div>
-<div class="visual"><div class="display"><div class="displaytop"><span>WEIGHTLAB / CONCEPT DISPLAY</span><span>RESEARCH MODE</span></div><div class="digits">---.--- <span style="font-size:18px">g</span></div><div class="sub">Illustrative interface · no physical sensor connected</div><div class="bar"><span></span></div><div class="displaytop"><span>PROJECT TARGET</span><span>100–1,000 G</span></div></div><div class="stats"><div class="stat"><b>0.1–1 kg</b><small>Target range</small></div><div class="stat"><b>6+</b><small>Lab areas planned</small></div><div class="stat"><b>100%</b><small>Project-led learning</small></div></div></div>
+
+<header>
+<div class="wrap nav">
+<a class="brand" href="#top">
+<span class="logo">W</span>
+<span>WEIGHTLAB <span style="color:var(--cyan)">X1</span></span>
+</a>
+
+<nav class="navlinks">
+<a href="#workspace" data-en="Workspace" data-ar="مساحة العمل">Workspace</a>
+<a href="#research" data-en="Research" data-ar="الأبحاث">Research</a>
+<a href="#workflow" data-en="Workflow" data-ar="سير العمل">Workflow</a>
+<a class="navcta" href="#workspace" data-en="Open tools ↗" data-ar="افتح الأدوات ↗">Open tools ↗</a>
+<button class="settings-btn" id="openSettings" type="button">
+⚙️ <span data-en="Settings" data-ar="الإعدادات">Settings</span>
+</button>
+</nav>
 </div>
-<section id="workspace"><div class="wrap"><div class="head"><div class="kicker">01 / Engineering workspace</div><h2>Your tools, all in one place.</h2><p>Open a lab to build a concept, explore a measurement principle, or document a project. More modules will be added in stages.</p></div>
+</header>
+
+<main id="top">
+
+<div class="wrap hero">
+<div>
+<div class="eyebrow" data-en="Student engineering platform · 2026" data-ar="منصة هندسية للطلاب · 2026">Student engineering platform · 2026</div>
+
+<h1 data-en="Design. Test.<br><span>Understand weight.</span>" data-ar="صمّم. اختبر.<br><span>افهم الوزن.</span>">
+Design. Test.<br><span>Understand weight.</span>
+</h1>
+
+<p class="lead" data-en="A digital engineering workspace for exploring weighing-scale concepts, building 3D designs, simulating sensor behaviour, and documenting experiments across a target range of 100–1,000 grams." data-ar="مساحة هندسية رقمية لاستكشاف أفكار الموازين، وإنشاء تصاميم ثلاثية الأبعاد، ومحاكاة سلوك المستشعرات، وتوثيق التجارب ضمن نطاق مستهدف من 100 إلى 1,000 غرام.">
+A digital engineering workspace for exploring weighing-scale concepts, building 3D designs, simulating sensor behaviour, and documenting experiments across a target range of 100–1,000 grams.
+</p>
+
+<div class="actions">
+<a class="btn" href="#workspace" data-en="Explore the workspace ↓" data-ar="استكشف مساحة العمل ↓">Explore the workspace ↓</a>
+<a class="btn secondary" href="research_library.html#sensors" data-en="Open research library ↗" data-ar="افتح مكتبة الأبحاث ↗">Open research library ↗</a>
+</div>
+</div>
+
+<div class="visual">
+<div class="display">
+<div class="displaytop">
+<span data-en="WEIGHTLAB / CONCEPT DISPLAY" data-ar="WEIGHTLAB / شاشة النموذج">WEIGHTLAB / CONCEPT DISPLAY</span>
+<span data-en="RESEARCH MODE" data-ar="وضع البحث">RESEARCH MODE</span>
+</div>
+<div class="digits">---.--- <span style="font-size:18px">g</span></div>
+<div class="sub" data-en="Illustrative interface · no physical sensor connected" data-ar="واجهة توضيحية · لا يوجد مستشعر فعلي متصل">Illustrative interface · no physical sensor connected</div>
+<div class="bar"><span></span></div>
+<div class="displaytop">
+<span data-en="PROJECT TARGET" data-ar="النطاق المستهدف للمشروع">PROJECT TARGET</span>
+<span>100–1,000 G</span>
+</div>
+</div>
+
+<div class="stats">
+<div class="stat"><b>0.1–1 kg</b><small data-en="Target range" data-ar="النطاق المستهدف">Target range</small></div>
+<div class="stat"><b>6+</b><small data-en="Lab areas planned" data-ar="أقسام المختبر المخططة">Lab areas planned</small></div>
+<div class="stat"><b>100%</b><small data-en="Project-led learning" data-ar="تعلم قائم على المشروع">Project-led learning</small></div>
+</div>
+</div>
+</div>
+
+<section id="workspace">
+<div class="wrap">
+<div class="head">
+<div class="kicker" data-en="01 / Engineering workspace" data-ar="01 / مساحة العمل الهندسية">01 / Engineering workspace</div>
+<h2 data-en="Your tools, all in one place." data-ar="كل أدواتك في مكان واحد.">Your tools, all in one place.</h2>
+<p data-en="Open a lab to build a concept, explore a measurement principle, or document a project. More modules will be added in stages." data-ar="افتح أحد المختبرات لبناء نموذج، أو استكشاف مبدأ للقياس، أو توثيق مشروع. ستتم إضافة المزيد من الوحدات على مراحل.">
+Open a lab to build a concept, explore a measurement principle, or document a project. More modules will be added in stages.
+</p>
+</div>
+
 <div class="grid">
-<a class="card" href="weightlab_x1_design_studio_v2.html"><div class="icon">◈</div><span class="label">3D workspace</span><h3>3D Design Studio</h3><p>Assemble scale concepts from platforms, frames, springs, sensors, mechanisms, and displays.</p><span class="link">Launch design studio →</span></a>
-<a class="card" href="weightlab_x1_engineering_lab_v3.html"><div class="icon">⌁</div><span class="label">Simulation & testing</span><h3>Engineering Lab</h3><p>Explore spring behaviour, fit calibration data, manage projects, and generate reports.</p><span class="link">Launch engineering lab →</span></a>
-<a class="card" href="research_library.html#sensors"><div class="icon">⌕</div><span class="label">Research library</span><h3>Sensor & Design Research</h3><p>Compare sensing technologies, mechanical frames, concept directions, and electronics architecture.</p><span class="link">Explore research →</span></a>
-<a class="card" href="research_library.html#testing"><div class="icon">▤</div><span class="label">Test methodology</span><h3>Measurement & Testing</h3><p>Review calibration, repeatability, hysteresis, drift, and load-position testing methods.</p><span class="link">View testing plan →</span></a>
-<a class="card" href="research_library.html#concepts"><div class="icon">⌘</div><span class="label">Concept development</span><h3>Design Concepts</h3><p>Explore alternative mechanical approaches and compare their practical trade-offs.</p><span class="link">Browse concepts →</span></a>
-<a class="card" href="research_library.html#electronics"><div class="icon">⎍</div><span class="label">System architecture</span><h3>Electronics Library</h3><p>Understand controllers, signal conditioning, ADCs, displays, power, and user controls.</p><span class="link">Explore electronics →</span></a>
-</div></div></section>
-<section id="workflow"><div class="wrap"><div class="head"><div class="kicker">02 / Project workflow</div><h2>From idea to evidence.</h2><p>A clear engineering process keeps the project grounded in measurements instead of guesses.</p></div>
+
+<a class="card" href="weightlab_x1_design_studio_v2.html">
+<div class="icon">◈</div>
+<span class="label" data-en="3D workspace" data-ar="مساحة ثلاثية الأبعاد">3D workspace</span>
+<h3 data-en="3D Design Studio" data-ar="استوديو التصميم ثلاثي الأبعاد">3D Design Studio</h3>
+<p data-en="Assemble scale concepts from platforms, frames, springs, sensors, mechanisms, and displays." data-ar="جمّع نماذج الموازين باستخدام المنصات والهياكل والنوابض والمستشعرات والآليات والشاشات.">Assemble scale concepts from platforms, frames, springs, sensors, mechanisms, and displays.</p>
+<span class="link" data-en="Launch design studio →" data-ar="افتح استوديو التصميم →">Launch design studio →</span>
+</a>
+
+<a class="card" href="weightlab_x1_engineering_lab_v3.html">
+<div class="icon">⌁</div>
+<span class="label" data-en="Simulation & testing" data-ar="المحاكاة والاختبار">Simulation & testing</span>
+<h3 data-en="Engineering Lab" data-ar="المختبر الهندسي">Engineering Lab</h3>
+<p data-en="Explore spring behaviour, fit calibration data, manage projects, and generate reports." data-ar="استكشف سلوك النوابض، وطبّق بيانات المعايرة، وأدر المشاريع، وأنشئ التقارير.">Explore spring behaviour, fit calibration data, manage projects, and generate reports.</p>
+<span class="link" data-en="Launch engineering lab →" data-ar="افتح المختبر الهندسي →">Launch engineering lab →</span>
+</a>
+
+<a class="card" href="research_library.html#sensors">
+<div class="icon">⌕</div>
+<span class="label" data-en="Research library" data-ar="مكتبة الأبحاث">Research library</span>
+<h3 data-en="Sensor & Design Research" data-ar="أبحاث المستشعرات والتصميم">Sensor & Design Research</h3>
+<p data-en="Compare sensing technologies, mechanical frames, concept directions, and electronics architecture." data-ar="قارن تقنيات الاستشعار والهياكل الميكانيكية واتجاهات التصميم وبنية الأنظمة الإلكترونية.">Compare sensing technologies, mechanical frames, concept directions, and electronics architecture.</p>
+<span class="link" data-en="Explore research →" data-ar="استكشف الأبحاث →">Explore research →</span>
+</a>
+
+<a class="card" href="research_library.html#testing">
+<div class="icon">▤</div>
+<span class="label" data-en="Test methodology" data-ar="منهجية الاختبار">Test methodology</span>
+<h3 data-en="Measurement & Testing" data-ar="القياس والاختبار">Measurement & Testing</h3>
+<p data-en="Review calibration, repeatability, hysteresis, drift, and load-position testing methods." data-ar="راجع طرق المعايرة وقابلية التكرار والتباطؤ والانجراف واختبار موضع الحمل.">Review calibration, repeatability, hysteresis, drift, and load-position testing methods.</p>
+<span class="link" data-en="View testing plan →" data-ar="اعرض خطة الاختبار →">View testing plan →</span>
+</a>
+
+<a class="card" href="research_library.html#concepts">
+<div class="icon">⌘</div>
+<span class="label" data-en="Concept development" data-ar="تطوير النماذج">Concept development</span>
+<h3 data-en="Design Concepts" data-ar="أفكار التصميم">Design Concepts</h3>
+<p data-en="Explore alternative mechanical approaches and compare their practical trade-offs." data-ar="استكشف الأساليب الميكانيكية البديلة وقارن بين مزاياها وقيودها العملية.">Explore alternative mechanical approaches and compare their practical trade-offs.</p>
+<span class="link" data-en="Browse concepts →" data-ar="تصفح النماذج →">Browse concepts →</span>
+</a>
+
+<a class="card" href="research_library.html#electronics">
+<div class="icon">⎍</div>
+<span class="label" data-en="System architecture" data-ar="بنية النظام">System architecture</span>
+<h3 data-en="Electronics Library" data-ar="مكتبة الإلكترونيات">Electronics Library</h3>
+<p data-en="Understand controllers, signal conditioning, ADCs, displays, power, and user controls." data-ar="تعرّف على وحدات التحكم ومعالجة الإشارات ومحوّلات ADC والشاشات والطاقة وأدوات التحكم.">Understand controllers, signal conditioning, ADCs, displays, power, and user controls.</p>
+<span class="link" data-en="Explore electronics →" data-ar="استكشف الإلكترونيات →">Explore electronics →</span>
+</a>
+
+</div>
+</div>
+</section>
+
+<section id="workflow">
+<div class="wrap">
+<div class="head">
+<div class="kicker" data-en="02 / Project workflow" data-ar="02 / مراحل المشروع">02 / Project workflow</div>
+<h2 data-en="From idea to evidence." data-ar="من الفكرة إلى الدليل.">From idea to evidence.</h2>
+<p data-en="A clear engineering process keeps the project grounded in measurements instead of guesses." data-ar="تجعل العملية الهندسية الواضحة المشروع معتمداً على القياسات بدلاً من التخمين.">A clear engineering process keeps the project grounded in measurements instead of guesses.</p>
+</div>
+
 <div class="grid">
-<div class="card"><div class="icon">01</div><h3>Explore</h3><p>Research sensor principles, mechanisms, materials, and constraints before choosing a design.</p></div>
-<div class="card"><div class="icon">02</div><h3>Design</h3><p>Create a 3D concept, define components, and record dimensions and assumptions.</p></div>
-<div class="card"><div class="icon">03</div><h3>Simulate</h3><p>Use simplified models to understand relationships and predict expected behaviour.</p></div>
-<div class="card"><div class="icon">04</div><h3>Prototype</h3><p>Build safely, check fit and stability, and document the actual materials and assembly.</p></div>
-<div class="card"><div class="icon">05</div><h3>Measure</h3><p>Use suitable reference masses and repeat tests across the intended measurement range.</p></div>
-<div class="card"><div class="icon">06</div><h3>Report</h3><p>Present results, uncertainty, limitations, and changes made after testing.</p></div>
-</div></div></section>
-<section id="research"><div class="wrap"><div class="head"><div class="kicker">03 / Engineering principles</div><h2>Built to explore, not to fake certainty.</h2><p>WEIGHTLAB X1 separates visual concepts, mathematical models, and measured prototype results so that each can be understood on its own terms.</p></div>
-<div class="split"><div class="feature"><h3>Simulation is not a physical test</h3><p>Models use stated assumptions and simplified relationships. Real components can behave differently because of friction, tolerances, temperature, noise, material properties, and assembly.</p></div><div class="feature"><h3>Calibration is evidence</h3><p>Accuracy claims require actual reference measurements, a documented method, repeat trials, and an honest account of uncertainty.</p></div></div>
-<div class="notice"><strong>Project integrity:</strong> The website is an educational design and simulation platform. Its 3D shapes and calculated outputs are not certified engineering drawings, validated finite-element analysis, or proof of real-world scale accuracy.</div>
-</div></section>
+<div class="card"><div class="icon">01</div><h3 data-en="Explore" data-ar="استكشف">Explore</h3><p data-en="Research sensor principles, mechanisms, materials, and constraints before choosing a design." data-ar="ابحث في مبادئ المستشعرات والآليات والمواد والقيود قبل اختيار التصميم.">Research sensor principles, mechanisms, materials, and constraints before choosing a design.</p></div>
+
+<div class="card"><div class="icon">02</div><h3 data-en="Design" data-ar="صمّم">Design</h3><p data-en="Create a 3D concept, define components, and record dimensions and assumptions." data-ar="أنشئ نموذجاً ثلاثي الأبعاد، وحدد المكونات، وسجّل الأبعاد والافتراضات.">Create a 3D concept, define components, and record dimensions and assumptions.</p></div>
+
+<div class="card"><div class="icon">03</div><h3 data-en="Simulate" data-ar="حاكِ">Simulate</h3><p data-en="Use simplified models to understand relationships and predict expected behaviour." data-ar="استخدم نماذج مبسطة لفهم العلاقات وتوقع السلوك المحتمل.">Use simplified models to understand relationships and predict expected behaviour.</p></div>
+
+<div class="card"><div class="icon">04</div><h3 data-en="Prototype" data-ar="أنشئ نموذجاً أولياً">Prototype</h3><p data-en="Build safely, check fit and stability, and document the actual materials and assembly." data-ar="أنشئ النموذج بأمان، وافحص التوافق والثبات، ووثّق المواد وطريقة التجميع الفعلية.">Build safely, check fit and stability, and document the actual materials and assembly.</p></div>
+
+<div class="card"><div class="icon">05</div><h3 data-en="Measure" data-ar="قِس">Measure</h3><p data-en="Use suitable reference masses and repeat tests across the intended measurement range." data-ar="استخدم كتلًا مرجعية مناسبة وكرّر الاختبارات عبر نطاق القياس المستهدف.">Use suitable reference masses and repeat tests across the intended measurement range.</p></div>
+
+<div class="card"><div class="icon">06</div><h3 data-en="Report" data-ar="وثّق النتائج">Report</h3><p data-en="Present results, uncertainty, limitations, and changes made after testing." data-ar="اعرض النتائج ومقدار عدم اليقين والقيود والتعديلات التي أُجريت بعد الاختبار.">Present results, uncertainty, limitations, and changes made after testing.</p></div>
+</div>
+</div>
+</section>
+
+<section id="research">
+<div class="wrap">
+<div class="head">
+<div class="kicker" data-en="03 / Engineering principles" data-ar="03 / المبادئ الهندسية">03 / Engineering principles</div>
+<h2 data-en="Built to explore, not to fake certainty." data-ar="للاستكشاف، لا لادعاء دقة غير مثبتة.">Built to explore, not to fake certainty.</h2>
+<p data-en="WEIGHTLAB X1 separates visual concepts, mathematical models, and measured prototype results so that each can be understood on its own terms." data-ar="يفصل WEIGHTLAB X1 بين النماذج المرئية والنماذج الرياضية ونتائج قياس النماذج الأولية، حتى يمكن فهم كل منها بشكل مستقل.">WEIGHTLAB X1 separates visual concepts, mathematical models, and measured prototype results so that each can be understood on its own terms.</p>
+</div>
+
+<div class="split">
+<div class="feature">
+<h3 data-en="Simulation is not a physical test" data-ar="المحاكاة ليست اختباراً فعلياً">Simulation is not a physical test</h3>
+<p data-en="Models use stated assumptions and simplified relationships. Real components can behave differently because of friction, tolerances, temperature, noise, material properties, and assembly." data-ar="تستخدم النماذج افتراضات معلنة وعلاقات مبسطة. قد تتصرف المكونات الحقيقية بشكل مختلف بسبب الاحتكاك والتفاوتات ودرجة الحرارة والضوضاء وخصائص المواد وطريقة التجميع.">Models use stated assumptions and simplified relationships. Real components can behave differently because of friction, tolerances, temperature, noise, material properties, and assembly.</p>
+</div>
+
+<div class="feature">
+<h3 data-en="Calibration is evidence" data-ar="المعايرة دليل عملي">Calibration is evidence</h3>
+<p data-en="Accuracy claims require actual reference measurements, a documented method, repeat trials, and an honest account of uncertainty." data-ar="تتطلب ادعاءات الدقة قياسات مرجعية فعلية وطريقة موثقة وتجارب متكررة وشرحاً صادقاً لمقدار عدم اليقين.">Accuracy claims require actual reference measurements, a documented method, repeat trials, and an honest account of uncertainty.</p>
+</div>
+</div>
+
+<div class="notice">
+<strong data-en="Project integrity:" data-ar="نزاهة المشروع:">Project integrity:</strong>
+<span data-en="The website is an educational design and simulation platform. Its 3D shapes and calculated outputs are not certified engineering drawings, validated finite-element analysis, or proof of real-world scale accuracy." data-ar="هذا الموقع منصة تعليمية للتصميم والمحاكاة. الأشكال ثلاثية الأبعاد والنتائج المحسوبة ليست رسومات هندسية معتمدة أو تحليلاً موثّقاً بالعناصر المحددة أو دليلاً على دقة ميزان حقيقي.">The website is an educational design and simulation platform. Its 3D shapes and calculated outputs are not certified engineering drawings, validated finite-element analysis, or proof of real-world scale accuracy.</span>
+</div>
+</div>
+</section>
+
 </main>
-<footer><div class="wrap foot"><div><strong style="color:var(--text);letter-spacing:.12em">WEIGHTLAB X1</strong><br>Independent student engineering workspace</div><div>Target range: 100–1,000 g · Concept exploration · Research · Simulation · Testing</div></div></footer>
-</body></html>
+
+<footer>
+<div class="wrap foot">
+<div>
+<strong style="color:var(--text);letter-spacing:.12em">WEIGHTLAB X1</strong><br>
+<span data-en="Independent student engineering workspace" data-ar="مساحة هندسية مستقلة لمشاريع الطلاب">Independent student engineering workspace</span>
+</div>
+<div data-en="Target range: 100–1,000 g · Concept exploration · Research · Simulation · Testing" data-ar="النطاق المستهدف: 100–1,000 غرام · استكشاف النماذج · الأبحاث · المحاكاة · الاختبار">Target range: 100–1,000 g · Concept exploration · Research · Simulation · Testing</div>
+</div>
+</footer>
+
+<!-- SETTINGS WINDOW -->
+<div class="settings-overlay" id="settingsOverlay" role="dialog" aria-modal="true" aria-labelledby="settingsTitle">
+<div class="settings-panel">
+
+<div class="settings-head">
+<h2 id="settingsTitle" data-en="Settings" data-ar="الإعدادات">Settings</h2>
+<button class="close-btn" id="closeSettings" type="button" aria-label="Close settings">×</button>
+</div>
+
+<p data-en="Choose the language used across the homepage." data-ar="اختر اللغة المستخدمة في الصفحة الرئيسية.">Choose the language used across the homepage.</p>
+
+<div class="language-options">
+<button class="language-option" id="englishOption" type="button">
+English
+<small>English interface</small>
+</button>
+
+<button class="language-option" id="arabicOption" type="button">
+العربية
+<small>واجهة باللغة العربية</small>
+</button>
+</div>
+
+</div>
+</div>
+
+<script>
+(function(){
+
+const overlay=document.getElementById('settingsOverlay');
+const openButton=document.getElementById('openSettings');
+const closeButton=document.getElementById('closeSettings');
+const enButton=document.getElementById('englishOption');
+const arButton=document.getElementById('arabicOption');
+
+function setLanguage(language){
+
+const isArabic=language==='ar';
+
+document.documentElement.lang=isArabic?'ar':'en';
+document.documentElement.dir=isArabic?'rtl':'ltr';
+
+document.querySelectorAll('[data-en][data-ar]').forEach(function(element){
+element.innerHTML=isArabic
+?element.getAttribute('data-ar')
+:element.getAttribute('data-en');
+});
+
+document.title=isArabic
+?'WEIGHTLAB X1 | مساحة العمل الهندسية'
+:'WEIGHTLAB X1 | Engineering Workspace';
+
+document.querySelector('meta[name="description"]').content=isArabic
+?'مساحة هندسية لتصميم الموازين ومحاكاتها واختبارها والبحث فيها.'
+:'WEIGHTLAB X1 engineering workspace for weighing-scale design, simulation, testing and research.';
+
+enButton.classList.toggle('active',!isArabic);
+arButton.classList.toggle('active',isArabic);
+
+try{
+localStorage.setItem('weightlab-language',language);
+}catch(error){}
+
+}
+
+openButton.addEventListener('click',function(){
+overlay.classList.add('open');
+});
+
+closeButton.addEventListener('click',function(){
+overlay.classList.remove('open');
+});
+
+overlay.addEventListener('click',function(event){
+if(event.target===overlay){
+overlay.classList.remove('open');
+}
+});
+
+enButton.addEventListener('click',function(){
+setLanguage('en');
+});
+
+arButton.addEventListener('click',function(){
+setLanguage('ar');
+});
+
+document.addEventListener('keydown',function(event){
+if(event.key==='Escape'){
+overlay.classList.remove('open');
+}
+});
+
+let savedLanguage='en';
+
+try{
+savedLanguage=localStorage.getItem('weightlab-language')||'en';
+}catch(error){}
+
+setLanguage(savedLanguage);
+
+})();
+</script>
+
+</body>
+</html>
