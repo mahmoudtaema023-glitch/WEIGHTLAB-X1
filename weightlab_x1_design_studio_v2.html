@@ -1,0 +1,238 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#081321">
+<title>WEIGHTLAB X1 | Design Studio</title>
+<style>
+:root{color-scheme:dark;--bg:#07111e;--panel:#101f32;--panel2:#142740;--line:#294762;--ink:#edf6ff;--muted:#9eb2c8;--cyan:#5ce1e6;--blue:#70aaff;--green:#80e0b0;--red:#ff8c9b}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at 50% -15%,#1d4160 0,transparent 45%),var(--bg);color:var(--ink);font:15px/1.5 Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+header{position:sticky;top:0;z-index:5;background:#081321eF;border-bottom:1px solid #ffffff17;backdrop-filter:blur(14px);padding:14px max(16px,calc((100% - 1320px)/2));display:flex;align-items:center;justify-content:space-between;gap:12px}
+.brand{font-weight:900;letter-spacing:.13em;font-size:13px}.brand b{color:var(--cyan)}header a{color:var(--muted);text-decoration:none;font-size:12px}
+main{max-width:1320px;margin:auto;padding:26px 16px 54px}.hero{display:flex;align-items:end;justify-content:space-between;gap:20px;margin-bottom:20px}.eyebrow{font-size:10px;letter-spacing:.2em;color:var(--cyan);font-weight:850}.hero h1{font-size:clamp(28px,5vw,46px);line-height:1.06;margin:7px 0}.hero p{max-width:720px;color:var(--muted);margin:0}.pill{border:1px solid #37627c;border-radius:99px;padding:7px 11px;color:var(--cyan);font-size:11px;white-space:nowrap}
+.workspace{display:grid;grid-template-columns:minmax(0,1.55fr) minmax(310px,.85fr);gap:16px;align-items:start}
+.viewer-card,.panel,.library-card{background:linear-gradient(150deg,#12263d,#0c1929);border:1px solid var(--line);border-radius:17px;overflow:hidden;box-shadow:0 12px 36px #0002}
+.viewer-top{display:flex;justify-content:space-between;align-items:center;padding:13px 15px;border-bottom:1px solid #ffffff12}.viewer-top strong{font-size:13px}.viewer-top span{font-size:10px;color:var(--muted)}
+.viewer{height:min(58vw,570px);min-height:350px;position:relative;background:radial-gradient(ellipse at 50% 35%,#1a3855,#07111e 75%)}canvas{width:100%;height:100%;display:block;touch-action:none}
+.hint{position:absolute;bottom:12px;left:12px;background:#07111edb;color:#a9bdd2;border:1px solid #ffffff18;border-radius:8px;padding:7px 10px;font-size:10px;pointer-events:none}
+.viewer-actions{display:flex;gap:7px;flex-wrap:wrap;padding:12px 14px;border-top:1px solid #ffffff12}
+.panel{padding:16px}.panel h2,.library-card h2{font-size:16px;margin:0 0 4px}.sub{font-size:11px;color:var(--muted);margin:0 0 14px}
+.tabs{display:flex;gap:6px;overflow:auto;padding:3px 0 11px}.tab{border:1px solid var(--line);background:#0b1929;color:var(--muted);border-radius:9px;padding:8px 10px;white-space:nowrap;font-size:11px;cursor:pointer}.tab.active{background:#164052;border-color:#3baeb4;color:#dfffff}
+.field{display:block;margin:11px 0;color:var(--muted);font-size:11px;font-weight:650}.field select,.field input[type=text],.field input[type=number]{display:block;width:100%;margin-top:6px;background:#091727;color:var(--ink);border:1px solid #34516c;border-radius:9px;padding:10px;font:inherit}
+.field input[type=range]{display:block;width:100%;margin-top:9px;accent-color:var(--cyan)}.field input[type=color]{width:100%;height:38px;margin-top:6px;background:none;border:0}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:9px}.btn{background:#142941;border:1px solid #355570;color:var(--ink);padding:10px 12px;border-radius:9px;font:inherit;font-size:11px;font-weight:750;cursor:pointer;transition:transform .15s,border-color .15s,background .15s}.btn:active{transform:scale(.97)}.btn:hover{border-color:var(--cyan)}.btn.primary{background:var(--cyan);color:#06151d;border-color:var(--cyan)}.btn.danger{color:#ffc1c9;border-color:#75404d;background:#321e2a}.btn:disabled{opacity:.4;cursor:not-allowed}
+.full{width:100%}.sectionline{height:1px;background:#ffffff14;margin:15px 0}.waterbox{display:none;border:1px solid #276b82;background:#0b2636;border-radius:12px;padding:12px;margin-top:12px}.waterbox.show{display:block}.water-head{display:flex;justify-content:space-between;font-size:11px}.water-head strong{color:#7ce8f0}.waterbar{height:9px;border-radius:20px;background:#071725;overflow:hidden;margin:10px 0}.waterbar i{display:block;height:100%;width:0;background:linear-gradient(90deg,#168dbd,#64e5ec);transition:width .2s}
+.status{font-size:11px;color:var(--green);min-height:19px;margin-top:9px}.smallnote{font-size:10px;color:var(--muted);line-height:1.5}
+.library{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:9px}.libitem{background:#0b1929;border:1px solid #29445e;border-radius:10px;padding:10px;text-align:left;color:var(--ink);cursor:pointer;min-width:0}.libitem b{display:block;font-size:11px}.libitem span{display:block;font-size:9px;color:var(--muted);margin-top:3px}
+.bottom{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:16px}.library-card{padding:16px}
+@media(max-width:850px){.workspace{grid-template-columns:1fr}.hero{display:block}.pill{display:inline-block;margin-top:12px}.viewer{height:440px}}
+@media(max-width:520px){main{padding:18px 11px 40px}.viewer{height:360px;min-height:300px}.bottom{grid-template-columns:1fr}.library{grid-template-columns:repeat(2,1fr)}header{padding:12px}.panel{padding:13px}}
+</style>
+<script type="importmap">
+{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js"}}
+</script>
+</head>
+<body>
+<header><div class="brand">WEIGHTLAB <b>X1</b> <span style="color:#8298ae;font-weight:500">/ DESIGN STUDIO</span></div><a href="./">← MAIN PROJECT</a></header>
+<main>
+<section class="hero"><div><div class="eyebrow">INTERACTIVE CONCEPT WORKSHOP · V2</div><h1>Design a scale from the ground up.</h1><p>Choose named components from different engineering families, combine them in the 3D workspace, and experiment with a water container's fill level.</p></div><span class="pill">● LIVE 3D WORKSPACE</span></section>
+<div class="workspace">
+<section class="viewer-card">
+ <div class="viewer-top"><strong>3D DESIGN PREVIEW</strong><span>ORBIT VIEW · LIVE</span></div>
+ <div class="viewer" id="viewer"><canvas id="view"></canvas><div class="hint">Drag to rotate · Pinch / scroll to zoom</div></div>
+ <div class="viewer-actions"><button class="btn" id="viewReset">Reset camera</button><button class="btn" id="fitView">Fit model</button><button class="btn" id="exportPng">Export PNG</button><button class="btn" id="clearAll">Clear workspace</button></div>
+</section>
+<aside class="panel">
+ <h2>Component library</h2><p class="sub">Pick a family, then choose a specifically named part.</p>
+ <div class="tabs" id="tabs">
+  <button class="tab active" data-family="platform">Platforms</button><button class="tab" data-family="frame">Frames</button><button class="tab" data-family="sensor">Sensors</button><button class="tab" data-family="container">Containers</button><button class="tab" data-family="spring">Springs</button><button class="tab" data-family="mechanism">Mechanisms</button><button class="tab" data-family="display">Displays</button><button class="tab" data-family="support">Supports</button>
+ </div>
+ <label class="field">Choose a component<select id="catalog"></select></label>
+ <div class="grid2"><button class="btn primary" id="addPart">＋ Add selected part</button><button class="btn" id="addPreset">＋ Add starter kit</button></div>
+ <div class="sectionline"></div>
+ <h2>Selected part</h2><p class="sub">Adjust the part currently selected in your model.</p>
+ <label class="field">In your design<select id="placed"><option value="">No parts added yet</option></select></label>
+ <div class="grid2"><label class="field">Scale<input id="scale" type="range" min=".35" max="2.8" step=".05" value="1"></label><label class="field">Vertical position<input id="height" type="range" min="0" max="6" step=".05" value="1"></label></div>
+ <label class="field">Part colour<input id="color" type="color" value="#5ce1e6"></label>
+ <div class="waterbox" id="waterbox">
+  <div class="water-head"><b>CONTAINER FILL</b><strong id="waterPct">0% full</strong></div>
+  <div class="waterbar"><i id="waterBar"></i></div>
+  <label class="field">Water amount<input id="water" type="range" min="0" max="100" value="0"></label>
+  <div class="grid2"><button class="btn" id="addWater">＋ Add 10%</button><button class="btn" id="removeWater">− Remove 10%</button></div>
+  <p class="smallnote">Visual water level only. It does not calculate real fluid mass or load-cell readings.</p>
+ </div>
+ <div class="grid2" style="margin-top:12px"><button class="btn danger" id="deletePart">Delete selected</button><button class="btn" id="duplicatePart">Duplicate</button></div>
+ <div class="sectionline"></div>
+ <div class="grid2"><button class="btn primary" id="saveDesign">Save design</button><button class="btn" id="loadDesign">Load saved design</button></div>
+ <div class="status" id="status" role="status">Ready. Choose a part to begin.</div>
+</aside>
+</div>
+<div class="bottom">
+ <section class="library-card"><h2>Quick-start designs</h2><p class="sub">Load a starter arrangement, then customize every part.</p><div class="grid2"><button class="btn" id="kitBasic">Basic platform scale</button><button class="btn" id="kitWater">Water test rig</button><button class="btn" id="kitSpring">Spring balance concept</button><button class="btn" id="kitOptical">Optical measurement rig</button></div></section>
+ <section class="library-card"><h2>Design notes</h2><p class="smallnote">This is a visual concept builder for brainstorming and school-project prototypes. Shapes are illustrative, not dimensionally validated CAD parts. Water is a visual fill effect only. Real builds need separate checks for stability, material strength, calibration, electrical safety and measurement accuracy.</p><p class="smallnote">Your saved design is stored in this browser on this device. Export PNG creates a picture of the current view.</p></section>
+</div>
+</main>
+<script type="module">
+import * as THREE from 'three';
+import { OrbitControls } from 'https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/controls/OrbitControls.js';
+
+const catalog={
+ platform:[
+  ['Aluminium Load Deck','A rigid rectangular weighing surface','deck'],
+  ['Circular Weighing Pan','Round top platform','roundpan'],
+  ['Four-Point Deck Plate','Platform with four corner mounts','fourdeck'],
+  ['Compact Top Plate','Small square platform','smallplate'],
+  ['Suspended Weighing Tray','Tray supported from above','tray']
+ ],
+ frame:[
+  ['Four-Post Portal Frame','Four uprights with top crossbars','portal'],
+  ['Twin-Rail Support Frame','Two parallel side rails','rails'],
+  ['A-Frame Support','Triangular side supports','aframe'],
+  ['C-Frame Cantilever','Single upright with projecting arm','cframe'],
+  ['Enclosed Bench Frame','Compact box-shaped chassis','bench']
+ ],
+ sensor:[
+  ['Strain-Gauge Beam','Beam-style force sensing concept','beam'],
+  ['Capacitive Gap Sensor','Non-contact displacement sensor','capacitive'],
+  ['Optical Interrupter','Slotted optical sensor module','optical'],
+  ['Ultrasonic Distance Module','Dual-transducer distance module','ultrasonic'],
+  ['Hall-Effect Position Sensor','Magnetic position sensor block','hall'],
+  ['Piezoelectric Force Disc','Circular force-sensing disc','piezo'],
+  ['Inductive Proximity Sensor','Cylindrical proximity sensor','inductive'],
+  ['Infrared Reflectance Sensor','Optical reflectance module','infrared']
+ ],
+ container:[
+  ['Clear Acrylic Water Tank','Transparent rectangular vessel','tank'],
+  ['Graduated Measuring Cup','Transparent marked beaker','beaker'],
+  ['Round Reservoir','Cylindrical liquid container','reservoir'],
+  ['Removable Sample Bowl','Open shallow container','bowl'],
+  ['Hanging Collection Bucket','Suspended bucket','bucket']
+ ],
+ spring:[
+  ['Compression Coil Spring','Vertical compression spring','compression'],
+  ['Extension Coil Spring','Tension spring with end hooks','extension'],
+  ['Leaf Spring Strip','Flat flexible beam concept','leaf'],
+  ['Torsion Spring','Coiled spring with two arms','torsion']
+ ],
+ mechanism:[
+  ['First-Class Lever','Pivoted lever arm','lever'],
+  ['Bell-Crank Linkage','Right-angle lever linkage','bellcrank'],
+  ['Rack-and-Pinion','Linear rack with gear','rack'],
+  ['Four-Bar Linkage','Connected pivoting bars','fourbar'],
+  ['Pulley and Cable','Wheel with hanging cable','pulley']
+ ],
+ display:[
+  ['Digital LCD Readout','Small digital display housing','lcd'],
+  ['LED Status Panel','Panel with indicator lights','ledpanel'],
+  ['Analogue Dial Gauge','Round dial indicator','dial']
+ ],
+ support:[
+  ['Adjustable Levelling Foot','Threaded height-adjustable foot','foot'],
+  ['Rubber Vibration Isolator','Soft support pad','isolator'],
+  ['Corner Mount Bracket','L-shaped mounting bracket','bracket'],
+  ['Cross-Brace Rod','Diagonal structural brace','brace'],
+  ['Fastener Set','Visible bolt and nut pair','fastener']
+ ]
+};
+const colors={platform:'#5ce1e6',frame:'#70aaff',sensor:'#f4bd68',container:'#76d7ff',spring:'#b6a0ff',mechanism:'#f19db5',display:'#8de0ad',support:'#c4d0dc'};
+const scene=new THREE.Scene();scene.background=new THREE.Color('#081522');
+const camera=new THREE.PerspectiveCamera(43,1,.1,150);camera.position.set(8,7,10);
+const renderer=new THREE.WebGLRenderer({canvas:document.getElementById('view'),antialias:true,preserveDrawingBuffer:true});renderer.setPixelRatio(Math.min(devicePixelRatio,2));renderer.shadowMap.enabled=true;
+const controls=new OrbitControls(camera,renderer.domElement);controls.enableDamping=true;controls.target.set(0,1.3,0);controls.minDistance=3;controls.maxDistance=35;
+scene.add(new THREE.HemisphereLight(0xd9edff,0x26364b,2.1));const sun=new THREE.DirectionalLight(0xffffff,2.4);sun.position.set(6,10,8);sun.castShadow=true;scene.add(sun);
+scene.add(new THREE.GridHelper(16,32,0x31516d,0x1b3045));
+const ground=new THREE.Mesh(new THREE.PlaneGeometry(40,40),new THREE.MeshStandardMaterial({color:0x081522,roughness:1}));ground.rotation.x=-Math.PI/2;ground.position.y=-.04;scene.add(ground);
+let parts=[],selected=null,nextId=1,currentFamily='platform';
+const $=id=>document.getElementById(id);
+function mat(color,transparent=false,opacity=1){return new THREE.MeshStandardMaterial({color,metalness:.28,roughness:.48,transparent,opacity,side:THREE.DoubleSide})}
+function mesh(g,geo,color,x=0,y=0,z=0,opts={}){const m=new THREE.Mesh(geo,mat(color,!!opts.transparent,opts.opacity??1));m.position.set(x,y,z);m.castShadow=true;m.receiveShadow=true;g.add(m);return m}
+function box(g,color,x,y,z,w,h,d){return mesh(g,new THREE.BoxGeometry(w,h,d),color,x,y,z)}
+function cylinder(g,color,x,y,z,r1,r2,h,n=24){return mesh(g,new THREE.CylinderGeometry(r1,r2,h,n),color,x,y,z)}
+function rod(g,color,a,b,r=.055){const A=new THREE.Vector3(...a),B=new THREE.Vector3(...b),d=new THREE.Vector3().subVectors(B,A);const m=mesh(g,new THREE.CylinderGeometry(r,r,d.length(),12),color,...A.clone().add(B).multiplyScalar(.5).toArray());m.quaternion.setFromUnitVectors(new THREE.Vector3(0,1,0),d.normalize());return m}
+function torus(g,color,x,y,z,r,t){return mesh(g,new THREE.TorusGeometry(r,t,8,32),color,x,y,z)}
+function buildGeometry(g,kind,color){
+ const metal='#9db4c9',dark='#334d68';
+ switch(kind){
+ case'deck':box(g,color,0,1.8,0,3.2,.22,2.5);for(let x of [-1.25,1.25])for(let z of [-.9,.9])cylinder(g,metal,x,1.62,z,.12,.12,.14);break;
+ case'roundpan':cylinder(g,color,0,1.8,0,1.55,1.55,.2,48);cylinder(g,metal,0,1.65,0,.22,.22,.12);break;
+ case'fourdeck':box(g,color,0,1.8,0,3,.18,3);for(let x of [-1.2,1.2])for(let z of [-1.2,1.2])cylinder(g,metal,x,1.66,z,.16,.16,.14);break;
+ case'smallplate':box(g,color,0,1.8,0,1.8,.2,1.8);break;
+ case'tray':box(g,color,0,1.8,0,2.7,.12,2);for(let x of [-1.3,1.3])box(g,color,x,1.98,0,.12,.25,2);for(let z of [-.95,.95])box(g,color,0,1.98,z,2.7,.25,.12);break;
+ case'portal':for(let x of [-1.5,1.5])for(let z of [-1.2,1.2])box(g,color,x,1.7,z,.16,3.4,.16);for(let z of [-1.2,1.2])box(g,color,0,3.35,z,3.15,.16,.16);box(g,color,0,3.05,-1.2,3,.14,.14);break;
+ case'rails':for(let z of [-.8,.8]){box(g,color,0,1.7,z,3.5,.18,.18);for(let x of [-1.55,1.55])box(g,color,x,1.15,z,.16,1.1,.16)}break;
+ case'aframe':for(let z of [-.7,.7]){rod(g,color,[-1.2,0,z],[0,3,z],.1);rod(g,color,[1.2,0,z],[0,3,z],.1);rod(g,color,[-.8,1,z],[.8,1,z],.07)}break;
+ case'cframe':box(g,color,-1.2,1.5,0,.22,3,.22);box(g,color,0,2.9,0,2.5,.2,.22);box(g,color,0,.15,0,2.5,.2,.22);break;
+ case'bench':box(g,color,0,.2,0,3.4,.35,2.4);for(let x of [-1.4,1.4])for(let z of [-.9,.9])box(g,color,x,-.55,z,.2,1.2,.2);break;
+ case'beam':box(g,color,0,1.2,0,2.4,.18,.42);for(let x of [-.85,.85])box(g,metal,x,1.32,0,.15,.08,.48);box(g,dark,0,1.04,0,.4,.2,.5);break;
+ case'capacitive':box(g,color,0,1.1,0,.9,.7,.35);box(g,metal,0,1.52,0,.65,.08,.4);box(g,dark,0,1.62,0,.45,.04,.3);break;
+ case'optical':box(g,color,0,1.1,0,.95,.65,.42);box(g,metal,-.36,1.48,0,.18,.2,.4);box(g,metal,.36,1.48,0,.18,.2,.4);box(g,'#ff6868',0,1.48,0,.04,.04,.3);break;
+ case'ultrasonic':box(g,color,0,1.1,0,1,.55,.38);for(let x of [-.27,.27])cylinder(g,metal,x,1.45,0,.18,.18,.16,24);break;
+ case'hall':box(g,color,0,1.1,0,.75,.65,.55);cylinder(g,metal,0,1.48,0,.12,.12,.18);break;
+ case'piezo':cylinder(g,color,0,1.1,0,.55,.55,.16,40);cylinder(g,metal,0,1.22,0,.4,.4,.08,40);break;
+ case'inductive':cylinder(g,color,0,1.1,0,.3,.3,1.15,24);cylinder(g,metal,0,1.72,0,.24,.24,.12,24);break;
+ case'infrared':box(g,color,0,1.1,0,.9,.48,.38);for(let x of [-.22,.22])cylinder(g,metal,x,1.38,0,.11,.11,.1,20);break;
+ case'tank':mesh(g,new THREE.BoxGeometry(1.9,2.3,.07),color,0,1.35,-.72,{transparent:true,opacity:.22});mesh(g,new THREE.BoxGeometry(1.9,2.3,.07),color,0,1.35,.72,{transparent:true,opacity:.22});mesh(g,new THREE.BoxGeometry(.07,2.3,1.5),color,-.92,1.35,0,{transparent:true,opacity:.22});mesh(g,new THREE.BoxGeometry(.07,2.3,1.5),color,.92,1.35,0,{transparent:true,opacity:.22});box(g,color,0,.2,0,1.9,.08,1.5);makeWater(g,1.78,2.1,1.3,0);break;
+ case'beaker':mesh(g,new THREE.CylinderGeometry(.72,.88,1.9,40,1,true),color,0,1.15,0,{transparent:true,opacity:.22});cylinder(g,'#245d82',0,.2,0,.68,.68,.04,40);makeWater(g,.66,1.65,.75,0);for(let i=0;i<5;i++)box(g,metal,.72,1.65-i*.25,.02,.15,.025,.035);break;
+ case'reservoir':mesh(g,new THREE.CylinderGeometry(.9,.9,2.1,40,1,true),color,0,1.2,0,{transparent:true,opacity:.2});cylinder(g,metal,0,2.28,0,.92,.92,.12,40);makeWater(g,1.85,1.85,1.65,0);break;
+ case'bowl':cylinder(g,color,0,.85,0,.95,1.25,.6,40);makeWater(g,.34,1.05,.9,0);break;
+ case'bucket':cylinder(g,color,0,1,0,.58,.85,1.6,32);torus(g,metal,0,1.82,0,.83,.045);makeWater(g,.65,.68,.58,0);break;
+ case'compression':for(let i=0;i<9;i++){const y=.35+i*.19;const t=torus(g,color,0,y,0,.32,.055);t.rotation.x=Math.PI/2;}cylinder(g,metal,0,1.1,0,.08,.08,1.8);break;
+ case'extension':for(let i=0;i<8;i++){const t=torus(g,color,0,.5+i*.17,0,.27,.045);t.rotation.x=Math.PI/2;}rod(g,metal,[0,0,0],[0,.3,0]);rod(g,metal,[0,1.7,0],[0,2,0]);break;
+ case'leaf':for(let i=0;i<3;i++)box(g,color,0,.75+i*.14,0,2.1-i*.25,.07,.22);break;
+ case'torsion':for(let i=0;i<5;i++){const t=torus(g,color,0,1+i*.03,0,.32,.05);t.rotation.x=Math.PI/2;}rod(g,metal,[0,1,0],[1.1,1,0]);rod(g,metal,[0,1,0],[-.8,1.8,0]);break;
+ case'lever':box(g,color,0,1.1,0,3,.12,.22);mesh(g,new THREE.ConeGeometry(.35,.55,4),metal,0,.75,0);cylinder(g,dark,0,.38,0,.16,.16,.18);break;
+ case'bellcrank':box(g,color,0,1.2,0,.18,1.6,.18);box(g,color,.7,1.95,0,1.55,.18,.18);cylinder(g,metal,0,1.2,0,.2,.2,.3);break;
+ case'rack':box(g,color,0,.9,0,2.7,.18,.3);for(let x=-1.2;x<=1.21;x+=.25)box(g,metal,x,1.05,0,.1,.16,.3);cylinder(g,color,0,1.55,0,.55,.55,.25,32);break;
+ case'fourbar':rod(g,color,[-1,1,0],[0,2,0],.09);rod(g,color,[0,2,0],[1,1,0],.09);rod(g,color,[-1,1,0],[1,1,0],.07);for(let x of [-1,0,1])cylinder(g,metal,x,x===0?2:1,0,.14,.14,.16);break;
+ case'pulley':torus(g,color,0,1.6,0,.62,.1);cylinder(g,metal,0,1.6,0,.13,.13,.5);rod(g,metal,[0,2.25,0],[0,3,0],.035);box(g,color,0,.45,0,.6,.8,.6);break;
+ case'lcd':box(g,color,0,1.1,0,1.4,.85,.3);box(g,'#071827',0,1.2,.17,1.05,.35,.035);break;
+ case'ledpanel':box(g,color,0,1.1,0,1.35,.65,.28);for(let i=0;i<4;i++)cylinder(g,['#ff6464','#f5d66b','#62e5ad','#62baff'][i],-.45+i*.3,1.18,.17,.08,.08,.05,16);break;
+ case'dial':cylinder(g,color,0,1.2,0,.65,.65,.2,40);cylinder(g,'#e7f1fa',0,1.2,.12,.52,.52,.04,40);rod(g,'#26364b',[0,1.2,.16],[.3,1.55,.16],.025);break;
+ case'foot':cylinder(g,color,0,.18,0,.34,.34,.25);cylinder(g,metal,0,.62,0,.09,.09,.7,16);cylinder(g,color,0,1,0,.18,.18,.12);break;
+ case'isolator':cylinder(g,color,0,.35,0,.38,.38,.55,24);cylinder(g,metal,0,.68,0,.24,.24,.1);break;
+ case'bracket':box(g,color,0,.7,0,.8,.15,.65);box(g,color,-.32,1,0,.15,.7,.65);break;
+ case'brace':rod(g,color,[-1,0,0],[1,2,0],.08);break;
+ case'fastener':cylinder(g,metal,0,.55,0,.12,.12,.85,12);cylinder(g,color,0,1,0,.24,.24,.14,6);break;
+ }
+}
+function makeWater(g,width,height,depth,level){const water=mesh(g,new THREE.BoxGeometry(width*.92,Math.max(.01,height*.92*level),depth*.92),'#29a9dc',0,.25+(height*.92*level)/2,0,{transparent:true,opacity:.72});water.userData.isWater=true;return water}
+function addPart(family,item,quiet=false){const [name,desc,kind]=item;const g=new THREE.Group();g.userData={id:nextId++,family,name,desc,kind,scale:1,color:colors[family],water:0};buildGeometry(g,kind,colors[family]);g.position.set((parts.length%3-1)*2.7,0,Math.floor(parts.length/3)*2.6);scene.add(g);parts.push(g);selectPart(g);refreshPlaced();if(!quiet)status(name+' added to your design.')}
+function refreshPlaced(){const s=$('placed');s.innerHTML='<option value="">Choose a placed component</option>';parts.forEach(p=>{const o=document.createElement('option');o.value=p.userData.id;o.textContent=p.userData.name+' · #'+p.userData.id;s.append(o)});if(selected)s.value=selected.userData.id}
+function selectPart(p){selected=p;refreshPlaced();$('waterbox').classList.toggle('show',!!p&&p.userData.family==='container');if(!p)return;$('scale').value=p.userData.scale;$('height').value=p.position.y;$('color').value=p.userData.color;if(p.userData.family==='container')updateWaterUI()}
+function updateWaterUI(){if(!selected)return;const v=selected.userData.water||0;$('water').value=v;$('waterPct').textContent=v+'% full';$('waterBar').style.width=v+'%';selected.children.filter(c=>c.userData.isWater).forEach(c=>{c.scale.y=Math.max(.01,v/100);c.position.y=.25+v/100*.5})}
+function familyUI(f){currentFamily=f;document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('active',t.dataset.family===f));$('catalog').innerHTML='';catalog[f].forEach((item,i)=>{const o=document.createElement('option');o.value=i;o.textContent=item[0]+' · '+item[1];$('catalog').append(o)})}
+document.querySelectorAll('.tab').forEach(t=>t.onclick=()=>familyUI(t.dataset.family));
+$('addPart').onclick=()=>{const item=catalog[currentFamily][+$('catalog').value];if(item)addPart(currentFamily,item)};
+$('placed').onchange=e=>selectPart(parts.find(p=>String(p.userData.id)===e.target.value)||null);
+$('scale').oninput=e=>{if(selected){selected.scale.setScalar(+e.target.value);selected.userData.scale=+e.target.value}};
+$('height').oninput=e=>{if(selected)selected.position.y=+e.target.value};
+$('color').oninput=e=>{if(selected){selected.userData.color=e.target.value;selected.traverse(o=>{if(o.isMesh&&!o.userData.isWater)o.material.color.set(e.target.value)})}};
+$('water').oninput=e=>{if(selected&&selected.userData.family==='container'){selected.userData.water=+e.target.value;updateWaterUI()}};
+$('addWater').onclick=()=>{if(selected){selected.userData.water=Math.min(100,(selected.userData.water||0)+10);updateWaterUI()}};
+$('removeWater').onclick=()=>{if(selected){selected.userData.water=Math.max(0,(selected.userData.water||0)-10);updateWaterUI()}};
+$('deletePart').onclick=()=>{if(!selected)return;scene.remove(selected);parts=parts.filter(p=>p!==selected);selected=null;refreshPlaced();$('waterbox').classList.remove('show');status('Selected part deleted.')};
+$('duplicatePart').onclick=()=>{if(!selected)return;const d=selected.userData;const item=catalog[d.family].find(x=>x[2]===d.kind);addPart(d.family,item);selected.position.x+=.65;status(d.name+' duplicated.')};
+$('clearAll').onclick=()=>{parts.forEach(p=>scene.remove(p));parts=[];selected=null;nextId=1;refreshPlaced();$('waterbox').classList.remove('show');status('Workspace cleared.')};
+$('viewReset').onclick=()=>{camera.position.set(8,7,10);controls.target.set(0,1.3,0);controls.update()};
+$('fitView').onclick=()=>{if(!parts.length)return;const b=new THREE.Box3();parts.forEach(p=>b.expandByObject(p));const c=b.getCenter(new THREE.Vector3());const size=b.getSize(new THREE.Vector3()).length();controls.target.copy(c);camera.position.copy(c).add(new THREE.Vector3(size*.8,size*.65,size*.9));camera.lookAt(c);controls.update()};
+$('exportPng').onclick=()=>{renderer.render(scene,camera);const a=document.createElement('a');a.download='weightlab-x1-design.png';a.href=renderer.domElement.toDataURL('image/png');a.click();status('PNG export started.')};
+function serialize(){return parts.map(p=>({family:p.userData.family,name:p.userData.name,kind:p.userData.kind,scale:p.userData.scale,color:p.userData.color,water:p.userData.water,x:p.position.x,y:p.position.y,z:p.position.z}))}
+$('saveDesign').onclick=()=>{try{localStorage.setItem('weightlab-x1-design-v2',JSON.stringify(serialize()));status('Design saved on this device in this browser.')}catch(e){status('Could not save. Browser storage may be unavailable.')}};
+$('loadDesign').onclick=()=>{try{const data=JSON.parse(localStorage.getItem('weightlab-x1-design-v2')||'null');if(!data){status('No saved design found on this device.');return}$('clearAll').click();data.forEach(d=>{const item=catalog[d.family]?.find(x=>x[2]===d.kind);if(!item)return;addPart(d.family,item,true);const p=parts[parts.length-1];p.scale.setScalar(d.scale);p.userData.scale=d.scale;p.userData.color=d.color;p.userData.water=d.water||0;p.position.set(d.x,d.y,d.z);p.traverse(o=>{if(o.isMesh&&!o.userData.isWater)o.material.color.set(d.color)});if(d.family==='container'){p.children.filter(c=>c.userData.isWater).forEach(c=>{c.scale.y=Math.max(.01,(d.water||0)/100);c.position.y=.25+(d.water||0)/100*.5})}});selectPart(parts.at(-1)||null);status('Saved design loaded.')}catch(e){status('Could not load saved design.')}};
+function starter(type){$('clearAll').click();if(type==='basic'){addPart('frame',catalog.frame[0],true);addPart('platform',catalog.platform[0],true);addPart('sensor',catalog.sensor[0],true);addPart('display',catalog.display[0],true);addPart('support',catalog.support[0],true)}
+if(type==='water'){addPart('frame',catalog.frame[1],true);addPart('container',catalog.container[0],true);addPart('sensor',catalog.sensor[3],true);parts.find(p=>p.userData.family==='container').userData.water=55;selectPart(parts.find(p=>p.userData.family==='container'));updateWaterUI()}
+if(type==='spring'){addPart('frame',catalog.frame[2],true);addPart('spring',catalog.spring[0],true);addPart('platform',catalog.platform[2],true);addPart('display',catalog.display[2],true)}
+if(type==='optical'){addPart('frame',catalog.frame[3],true);addPart('sensor',catalog.sensor[2],true);addPart('platform',catalog.platform[3],true);addPart('display',catalog.display[1],true)}
+$('fitView').click();status('Starter design loaded. Customize any component.') }
+$('addPreset').onclick=()=>starter('basic');$('kitBasic').onclick=()=>starter('basic');$('kitWater').onclick=()=>starter('water');$('kitSpring').onclick=()=>starter('spring');$('kitOptical').onclick=()=>starter('optical');
+function status(s){$('status').textContent=s}
+function resize(){const c=$('view'),w=c.clientWidth,h=c.clientHeight;if(!w||!h)return;renderer.setSize(w,h,false);camera.aspect=w/h;camera.updateProjectionMatrix()}
+new ResizeObserver(resize).observe($('viewer'));resize();window.addEventListener('resize',resize);
+function animate(){requestAnimationFrame(animate);controls.update();renderer.render(scene,camera)}animate();
+window.addEventListener('error',e=>status('Startup issue: '+(e.message||'refresh the page and check internet access')));
+window.addEventListener('unhandledrejection',e=>status('3D library issue: '+(e.reason?.message||'check internet access')));
+familyUI('platform');
+</script>
+</body>
+</html>
