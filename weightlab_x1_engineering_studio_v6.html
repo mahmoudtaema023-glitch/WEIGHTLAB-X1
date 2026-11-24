@@ -15,7 +15,15 @@
 </style>
 </head>
 <body>
-<header><div><div class="brand">WEIGHTLAB <b>X1</b></div><div class="sub">ENGINEERING DESIGN + INTERACTIVE SIMULATION · V6</div></div><div class="tools"><button id="undo">↶ Undo</button><button id="redo">↷ Redo</button><button id="save">Save</button><button id="load">Load</button><button id="export">Export JSON</button><button id="import">Import JSON</button><button id="png">PNG</button></div></header>
+<header><div><div class="brand">WEIGHTLAB <b>X1</b></div><div class="sub">ENGINEERING DESIGN + INTERACTIVE SIMULATION · V6</div></div><div class="tools"><button id="snapToggle" class="active">Snap: ON</button>
+<select id="snapStep" title="Snap increment">
+<option value="0.1">0.1 m</option>
+<option value="0.25" selected>0.25 m</option>
+<option value="0.5">0.5 m</option>
+<option value="1">1 m</option>
+</select>
+<button id="spaceToggle">Space: WORLD</button>
+<button id="undo">↶ Undo</button><button id="redo">↷ Redo</button><button id="save">Save</button><button id="load">Load</button><button id="export">Export JSON</button><button id="import">Import JSON</button><button id="png">PNG</button></div></header>
 <main>
 <aside class="panel">
 <div class="heading">COMPONENT LIBRARY</div><div class="hint">Add parts, select them, then edit their properties.</div><div id="library" class="lib"></div>
