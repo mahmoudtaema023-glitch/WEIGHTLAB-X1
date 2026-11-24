@@ -283,11 +283,18 @@ async function connectBluetooth() {
     "characteristicvaluechanged",
     event => {
       const data = event.target.value;
-      const flags = data.getUint8(0);
-      const rawWeight = data.getUint16(1, true);
-      let weight = rawWeight * ((flags & 1) ? 0.01 : 0.005);
+     const flags = data.getUint8(0);
+const raw = data.getUint16(1, true);
+const exponent = (raw >> 12) & 0x0F;
+let mantissa = raw & 0x0FFF;
 
-      if (flags & 1) weight *= 0.45359237;
+if (mantissa & 0x0800) mantissa -= 0x1000;
+
+let weight = mantissa * Math.pow(10, exponent > 7 ? exponent - 16 : exponent);
+
+if (flags & 1) weight *= 0.45359237;
+
+showHardwareWeight(weight);
 
       showHardwareWeight(weight);
     }
