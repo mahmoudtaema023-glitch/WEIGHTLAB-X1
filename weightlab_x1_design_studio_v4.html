@@ -1,1 +1,812 @@
 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>WEIGHTLAB X1 | Engineering Studio V4</title>
+
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+    "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+  }
+}
+</script>
+
+<style>
+:root {
+  --bg:#070d18;
+  --panel:#101a2b;
+  --panel2:#152238;
+  --line:#253650;
+  --text:#e8f1ff;
+  --muted:#8294ad;
+  --blue:#42a5ff;
+  --green:#35d6a0;
+  --orange:#ffb454;
+}
+*{box-sizing:border-box}
+body{
+  margin:0;background:var(--bg);color:var(--text);
+  font-family:Inter,Arial,sans-serif;overflow:hidden
+}
+button,input,select{font:inherit}
+button{
+  border:1px solid var(--line);background:#17263d;
+  color:var(--text);padding:9px 12px;border-radius:7px;
+  cursor:pointer;transition:.15s
+}
+button:hover{background:#254267;border-color:var(--blue)}
+button.active{background:#1763a6;border-color:#53b5ff}
+button.danger:hover{background:#812d39}
+header{
+  height:58px;background:#0c1524;border-bottom:1px solid var(--line);
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 16px;gap:12px
+}
+.brand{font-weight:800;letter-spacing:1px}
+.brand span{color:var(--blue)}
+.subbrand{font-size:10px;color:var(--muted);margin-top:3px}
+.toolbar{display:flex;gap:6px;flex-wrap:wrap}
+main{
+  display:grid;grid-template-columns:225px minmax(0,1fr) 275px;
+  height:calc(100vh - 58px)
+}
+.panel{
+  background:var(--panel);overflow-y:auto;padding:13px;
+  border-right:1px solid var(--line)
+}
+.right{border-right:0;border-left:1px solid var(--line)}
+.section-title{
+  font-size:11px;color:var(--muted);font-weight:800;
+  letter-spacing:1.2px;margin:10px 0
+}
+.library-item{
+  width:100%;display:flex;justify-content:space-between;
+  margin:5px 0;text-align:left;background:#142137
+}
+.library-item small{color:var(--muted)}
+.viewport{
+  min-width:0;position:relative;background:#080f1d;overflow:hidden
+}
+#scene{position:absolute;inset:0}
+#scene canvas{display:block;width:100%;height:100%}
+.hud{
+  position:absolute;top:13px;left:13px;pointer-events:none;
+  background:#0a1424dd;border:1px solid var(--line);
+  border-radius:9px;padding:10px 13px;font-size:11px;color:var(--muted)
+}
+.hud strong{color:var(--green)}
+.bottom-bar{
+  position:absolute;bottom:12px;left:50%;transform:translateX(-50%);
+  display:flex;gap:7px;background:#0a1424e8;
+  border:1px solid var(--line);padding:8px;border-radius:10px
+}
+.bottom-bar button{min-width:65px}
+.field{margin:10px 0}
+.field label{display:block;color:var(--muted);font-size:11px;margin-bottom:5px}
+.field input,.field select{
+  width:100%;background:#0a1424;border:1px solid var(--line);
+  color:var(--text);padding:8px;border-radius:6px
+}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.metric{
+  background:#0b1728;border:1px solid var(--line);
+  border-radius:8px;padding:10px;margin:7px 0
+}
+.metric small{display:block;color:var(--muted);font-size:10px}
+.metric strong{display:block;font-size:19px;margin-top:5px;color:var(--green)}
+.object-row{
+  display:flex;align-items:center;justify-content:space-between;
+  background:#0d192a;border:1px solid var(--line);
+  border-radius:6px;padding:8px;margin:5px 0;font-size:12px;
+  cursor:pointer
+}
+.object-row.selected{border-color:var(--blue);background:#15304c}
+.muted{color:var(--muted);font-size:11px}
+.status{color:var(--green);font-size:11px}
+hr{border:0;border-top:1px solid var(--line);margin:14px 0}
+#toast{
+  position:absolute;top:14px;right:14px;background:#173c35;
+  border:1px solid var(--green);padding:10px 14px;border-radius:8px;
+  opacity:0;transition:.2s;pointer-events:none
+}
+#toast.show{opacity:1}
+@media(max-width:850px){
+  main{grid-template-columns:155px minmax(0,1fr)}
+  .right{display:none}
+  header{height:auto;min-height:58px;flex-wrap:wrap;padding:8px}
+  main{height:calc(100vh - 75px)}
+}
+@media(max-width:550px){
+  main{grid-template-columns:105px minmax(0,1fr)}
+  .panel{padding:7px}
+  .library-item{padding:7px 5px;font-size:10px}
+  .toolbar button{padding:7px;font-size:10px}
+  .brand{font-size:13px}
+}
+</style>
+</head>
+
+<body>
+<header>
+  <div>
+    <div class="brand">WEIGHTLAB <span>X1</span></div>
+    <div class="subbrand">ENGINEERING DESIGN STUDIO · V4</div>
+  </div>
+  <div class="toolbar">
+    <button id="undoBtn">↶ Undo</button>
+    <button id="redoBtn">↷ Redo</button>
+    <button id="saveBtn">Save</button>
+    <button id="loadBtn">Load</button>
+    <button id="exportBtn">Export PNG</button>
+  </div>
+</header>
+
+<main>
+  <aside class="panel">
+    <div class="section-title">COMPONENT LIBRARY</div>
+    <div class="muted">Select a component to add it to your design.</div>
+    <div id="library"></div>
+    <hr>
+    <div class="section-title">SCENE OBJECTS</div>
+    <div id="objectList"></div>
+    <hr>
+    <button id="addGround" style="width:100%">＋ Add ground</button>
+    <button id="clearBtn" class="danger" style="width:100%;margin-top:7px">Clear scene</button>
+  </aside>
+
+  <section class="viewport">
+    <div id="scene"></div>
+    <div class="hud">
+      <strong>● LIVE VIEWPORT</strong><br>
+      3D ENGINE · REAL-TIME EDITING<br>
+      <span id="objectCount">0 objects</span>
+    </div>
+    <div class="bottom-bar">
+      <button class="active" data-mode="translate">Move</button>
+      <button data-mode="rotate">Rotate</button>
+      <button data-mode="scale">Scale</button>
+      <button id="duplicateBtn">Duplicate</button>
+      <button id="deleteBtn">Delete</button>
+    </div>
+    <div id="toast"></div>
+  </section>
+
+  <aside class="panel right">
+    <div class="section-title">OBJECT INSPECTOR</div>
+    <div id="inspector">
+      <p class="muted">Select an object in the scene to inspect and edit it.</p>
+    </div>
+    <hr>
+    <div class="section-title">SIMULATION CONTROL</div>
+    <div class="field">
+      <label>Applied load (kg)</label>
+      <input id="loadInput" type="number" value="10" min="0">
+    </div>
+    <div class="field">
+      <label>Spring stiffness (N/m)</label>
+      <input id="stiffnessInput" type="number" value="1000" min="1">
+    </div>
+    <button id="simulateBtn" style="width:100%">▶ Run simulation</button>
+    <div class="metric">
+      <small>SIMULATED FORCE</small>
+      <strong id="forceValue">0.0 N</strong>
+    </div>
+    <div class="metric">
+      <small>SIMULATED DISPLACEMENT</small>
+      <strong id="displacementValue">0.00 mm</strong>
+    </div>
+    <div class="metric">
+      <small>SENSOR OUTPUT</small>
+      <strong id="sensorValue">0.000 mV</strong>
+    </div>
+    <p class="muted">These are simplified software estimates, not readings from physical sensors.</p>
+    <hr>
+    <div class="section-title">PROJECT STATUS</div>
+    <div class="status" id="saveStatus">● Project not saved yet</div>
+    <p class="muted">Drag to orbit. Scroll to zoom. Right-click to pan.</p>
+  </aside>
+</main>
+
+<script type="module">
+import * as THREE from "three";
+import { OrbitControls } from "three/addons/controls/OrbitControls.js";
+import { TransformControls } from "three/addons/controls/TransformControls.js";
+
+const container = document.getElementById("scene");
+const scene = new THREE.Scene();
+scene.background = new THREE.Color("#080f1d");
+scene.fog = new THREE.Fog("#080f1d", 20, 65);
+
+const camera = new THREE.PerspectiveCamera(
+  48, container.clientWidth / container.clientHeight, .1, 200
+);
+camera.position.set(8,7,10);
+
+const renderer = new THREE.WebGLRenderer({antialias:true,preserveDrawingBuffer:true});
+renderer.setPixelRatio(Math.min(devicePixelRatio,2));
+renderer.setSize(container.clientWidth,container.clientHeight);
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+renderer.outputColorSpace = THREE.SRGBColorSpace;
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 1.15;
+container.appendChild(renderer.domElement);
+
+const orbit = new OrbitControls(camera,renderer.domElement);
+orbit.enableDamping = true;
+orbit.target.set(0,1,0);
+
+scene.add(new THREE.HemisphereLight(0xbad8ff,0x263044,2));
+
+const keyLight = new THREE.DirectionalLight(0xffffff,3);
+keyLight.position.set(7,12,8);
+keyLight.castShadow = true;
+keyLight.shadow.mapSize.set(2048,2048);
+scene.add(keyLight);
+
+const fillLight = new THREE.PointLight(0x319bff,35,30);
+fillLight.position.set(-7,5,-5);
+scene.add(fillLight);
+
+const grid = new THREE.GridHelper(30,60,0x315070,0x1b2d45);
+grid.position.y = 0;
+scene.add(grid);
+
+const floor = new THREE.Mesh(
+  new THREE.PlaneGeometry(200,200),
+  new THREE.MeshStandardMaterial({color:0x0a1422,roughness:.9})
+);
+floor.rotation.x=-Math.PI/2;
+floor.position.y=-.015;
+floor.receiveShadow=true;
+scene.add(floor);
+
+const transform = new TransformControls(camera,renderer.domElement);
+transform.setMode("translate");
+scene.add(transform);
+
+transform.addEventListener("dragging-changed",e=>{
+  orbit.enabled=!e.value;
+});
+transform.addEventListener("mouseUp",()=>saveHistory());
+
+const components = [
+  ["Platform","platform","Load platform"],
+  ["Frame","frame","Structural frame"],
+  ["Beam","beam","Metal beam"],
+  ["Spring","spring","Compression spring"],
+  ["Load cell","loadcell","Force measurement sensor"],
+  ["Strain gauge","strain","Strain measurement sensor"],
+  ["Display","display","Digital display"],
+  ["Controller","controller","Control module"],
+  ["Motor","motor","Electric motor"],
+  ["Bearing","bearing","Rotating bearing"],
+  ["Bracket","bracket","Mounting bracket"],
+  ["Rail","rail","Linear guide rail"],
+  ["Ultrasonic sensor","ultrasonic","Distance sensor"],
+  ["Optical sensor","optical","Optical measurement sensor"],
+  ["Pressure sensor","pressure","Pressure measurement sensor"],
+  ["Container","container","Generic enclosure"]
+];
+
+const library=document.getElementById("library");
+components.forEach(([name,type,description])=>{
+  const b=document.createElement("button");
+  b.className="library-item";
+  b.innerHTML=`<span>＋ ${name}</span><small>3D</small>`;
+  b.title=description;
+  b.onclick=()=>createPart(type);
+  library.appendChild(b);
+});
+
+let objects=[];
+let selected=null;
+let history=[];
+let historyIndex=-1;
+let serial=1;
+
+function material(color,metalness=.35,roughness=.38){
+  return new THREE.MeshStandardMaterial({
+    color,metalness,roughness
+  });
+}
+
+function mesh(geometry,color,metalness=.35,roughness=.38){
+  const m=new THREE.Mesh(geometry,material(color,metalness,roughness));
+  m.castShadow=true;
+  m.receiveShadow=true;
+  return m;
+}
+
+function makePart(type){
+  const group=new THREE.Group();
+  group.userData.type=type;
+
+  const steel=0x8299b5;
+  const dark=0x25364b;
+  const blue=0x178ee8;
+  const orange=0xffa34d;
+
+  function add(geometry,color,x=0,y=0,z=0,metal=.4){
+    const m=mesh(geometry,color,metal);
+    m.position.set(x,y,z);
+    group.add(m);
+    return m;
+  }
+
+  switch(type){
+    case "platform":
+      add(new THREE.BoxGeometry(2.8,.18,2),steel,0,.7,0,.8);
+      add(new THREE.BoxGeometry(2.3,.08,1.5),blue,0,.13,0,.65);
+      break;
+
+    case "frame":
+      for(const x of [-1.4,1.4]){
+        for(const z of [-1,1]){
+          add(new THREE.BoxGeometry(.16,3,.16),steel,x,1.5,z,.85);
+        }
+      }
+      add(new THREE.BoxGeometry(3,.16,.16),steel,0,3,1);
+      add(new THREE.BoxGeometry(3,.16,.16),steel,0,3,-1);
+      add(new THREE.BoxGeometry(.16,.16,2),steel,-1.4,3,0);
+      add(new THREE.BoxGeometry(.16,.16,2),steel,1.4,3,0);
+      break;
+
+    case "beam":
+      add(new THREE.BoxGeometry(3,.22,.22),steel,0,0,0,.85);
+      add(new THREE.BoxGeometry(.22,1,.22),steel,-1.4,0,0,.85);
+      add(new THREE.BoxGeometry(.22,1,.22),steel,1.4,0,0,.85);
+      break;
+
+    case "spring":
+      add(new THREE.CylinderGeometry(.65,.65,.12,32),dark,0,-.8,0,.7);
+      add(new THREE.CylinderGeometry(.65,.65,.12,32),dark,0,.8,0,.7);
+      {
+        const points=[];
+        for(let i=0;i<=180;i++){
+          const t=i/180;
+          const a=t*Math.PI*2*8;
+          points.push(new THREE.Vector3(
+            Math.cos(a)*.43,
+            -.7+t*1.4,
+            Math.sin(a)*.43
+          ));
+        }
+        const curve=new THREE.CatmullRomCurve3(points);
+        const coil=new THREE.Mesh(
+          new THREE.TubeGeometry(curve,500,.055,10,false),
+          material(orange,.8,.22)
+        );
+        coil.castShadow=true;
+        group.add(coil);
+      }
+      break;
+
+    case "loadcell":
+      add(new THREE.BoxGeometry(1.5,.3,.55),steel,0,0,0,.85);
+      add(new THREE.BoxGeometry(.7,.12,.25),blue,0,.22,0,.7);
+      add(new THREE.CylinderGeometry(.09,.09,.16,24),orange,0,.35,0,.7);
+      break;
+
+    case "strain":
+      add(new THREE.BoxGeometry(1.2,.12,.5),steel);
+      add(new THREE.BoxGeometry(.5,.025,.3),orange,0,.075,0,.6);
+      break;
+
+    case "display":
+      add(new THREE.BoxGeometry(1.5,.9,.22),dark);
+      add(new THREE.BoxGeometry(1.18,.48,.04),0x06101a,0,.05,.13,.2);
+      add(new THREE.BoxGeometry(.65,.08,.03),0x31f2a0,0,.08,.16,.2);
+      break;
+
+    case "controller":
+      add(new THREE.BoxGeometry(1.3,.35,1),dark);
+      for(let x=-.4;x<=.4;x+=.4){
+        add(new THREE.CylinderGeometry(.06,.06,.08,12),blue,x,.22,.35);
+      }
+      break;
+
+    case "motor":
+      add(new THREE.CylinderGeometry(.48,.48,1.4,40),steel,0,0,0,.85);
+      add(new THREE.CylinderGeometry(.18,.18,.45,32),orange,0,.9,0,.8);
+      add(new THREE.CylinderGeometry(.55,.55,.15,40),dark,0,-.65,0,.8);
+      break;
+
+    case "bearing":
+      add(new THREE.CylinderGeometry(.65,.65,.3,48),steel,0,0,0,.9);
+      add(new THREE.CylinderGeometry(.28,.28,.34,40),0x101b2c,0,0,0,.4);
+      add(new THREE.TorusGeometry(.43,.07,12,48),orange,0,.18,0,.8);
+      break;
+
+    case "bracket":
+      add(new THREE.BoxGeometry(1,.15,.65),steel,0,-.42,0,.8);
+      add(new THREE.BoxGeometry(.15,1,.65),steel,-.42,0,0,.8);
+      break;
+
+    case "rail":
+      add(new THREE.BoxGeometry(3,.16,.35),steel,0,0,0,.9);
+      add(new THREE.BoxGeometry(1,.35,.55),blue,0,.22,0,.7);
+      break;
+
+    case "ultrasonic":
+      add(new THREE.BoxGeometry(.8,.55,.35),dark);
+      add(new THREE.CylinderGeometry(.15,.15,.16,32),blue,-.2,.34,0,.7);
+      add(new THREE.CylinderGeometry(.15,.15,.16,32),blue,.2,.34,0,.7);
+      break;
+
+    case "optical":
+      add(new THREE.BoxGeometry(.8,.7,.55),dark);
+      add(new THREE.CylinderGeometry(.2,.2,.2,32),blue,0,0,.36,.8);
+      break;
+
+    case "pressure":
+      add(new THREE.CylinderGeometry(.38,.38,.55,40),steel,0,0,0,.8);
+      add(new THREE.CylinderGeometry(.18,.18,.14,32),orange,0,.33,0,.8);
+      break;
+
+    case "container":
+      add(new THREE.BoxGeometry(1.3,1,1),blue,0,0,0,.5);
+      add(new THREE.BoxGeometry(1.1,.08,.8),dark,0,.54,0,.5);
+      break;
+
+    default:
+      add(new THREE.BoxGeometry(1,1,1),blue);
+  }
+
+  return group;
+}
+
+function createPart(type,recordHistory=true){
+  const group=makePart(type);
+  group.position.set(
+    (Math.random()-.5)*1.5,
+    type==="platform"?1:0.8,
+    (Math.random()-.5)*1.5
+  );
+  group.userData.id=serial++;
+  group.userData.name=type.charAt(0).toUpperCase()+type.slice(1)+" "+group.userData.id;
+  group.userData.description=components.find(c=>c[1]===type)?.[2]||"3D component";
+  group.userData.mass=1;
+  group.userData.material="Aluminium alloy";
+  group.userData.category=type;
+  group.traverse(child=>{
+    if(child.isMesh) child.userData.parentPart=group;
+  });
+  scene.add(group);
+  objects.push(group);
+  selectObject(group);
+  updateObjectList();
+  if(recordHistory)saveHistory();
+  return group;
+}
+
+function selectObject(obj){
+  selected=obj;
+  transform.detach();
+  if(obj)transform.attach(obj);
+  updateObjectList();
+  updateInspector();
+}
+
+function updateObjectList(){
+  const list=document.getElementById("objectList");
+  list.innerHTML="";
+  objects.forEach(obj=>{
+    const row=document.createElement("div");
+    row.className="object-row"+(obj===selected?" selected":"");
+    row.innerHTML=`<span>${obj.userData.name}</span><span>›</span>`;
+    row.onclick=()=>selectObject(obj);
+    list.appendChild(row);
+  });
+  document.getElementById("objectCount").textContent=objects.length+" objects";
+}
+
+function field(label,value,onchange,step="any"){
+  return `
+    <div class="field">
+      <label>${label}</label>
+      <input data-prop="${label}" type="number" step="${step}" value="${Number(value).toFixed(3)}">
+    </div>`;
+}
+
+function updateInspector(){
+  const box=document.getElementById("inspector");
+  if(!selected){
+    box.innerHTML='<p class="muted">Select an object to inspect it.</p>';
+    return;
+  }
+  const p=selected.position,r=selected.rotation,s=selected.scale;
+  box.innerHTML=`
+    <div class="metric">
+      <small>SELECTED COMPONENT</small>
+      <strong style="font-size:15px">${selected.userData.name}</strong>
+      <small>${selected.userData.description}</small>
+    </div>
+    <div class="field">
+      <label>Object name</label>
+      <input id="objectName" value="${selected.userData.name}">
+    </div>
+    <div class="field">
+      <label>Material</label>
+      <select id="objectMaterial">
+        <option>Aluminium alloy</option>
+        <option>Stainless steel</option>
+        <option>Carbon steel</option>
+        <option>Plastic</option>
+        <option>Rubber</option>
+        <option>Copper</option>
+      </select>
+    </div>
+    <div class="field">
+      <label>Estimated mass (kg)</label>
+      <input id="objectMass" type="number" min="0" step=".1" value="${selected.userData.mass}">
+    </div>
+    <hr>
+    <div class="section-title">POSITION · METRES</div>
+    <div class="grid2">
+      ${field("Position X",p.x)}
+      ${field("Position Y",p.y)}
+      ${field("Position Z",p.z)}
+    </div>
+    <div class="section-title">ROTATION · DEGREES</div>
+    <div class="grid2">
+      ${field("Rotation X",THREE.MathUtils.radToDeg(r.x))}
+      ${field("Rotation Y",THREE.MathUtils.radToDeg(r.y))}
+      ${field("Rotation Z",THREE.MathUtils.radToDeg(r.z))}
+    </div>
+    <div class="section-title">SCALE</div>
+    <div class="grid2">
+      ${field("Scale X",s.x)}
+      ${field("Scale Y",s.y)}
+      ${field("Scale Z",s.z)}
+    </div>
+    <button id="applyTransform" style="width:100%">Apply values</button>
+    <hr>
+    <div class="section-title">COMPONENT INFORMATION</div>
+    <p class="muted">Type: ${selected.userData.category}</p>
+    <p class="muted">ID: ${selected.userData.id}</p>
+    <p class="muted">Geometry: Three.js mesh assembly</p>
+    <p class="muted">Mass: ${selected.userData.mass} kg</p>
+  `;
+
+  document.getElementById("objectMaterial").value=selected.userData.material;
+  document.getElementById("objectName").onchange=e=>{
+    selected.userData.name=e.target.value;
+    updateObjectList();
+    saveHistory();
+  };
+  document.getElementById("objectMaterial").onchange=e=>{
+    selected.userData.material=e.target.value;
+    saveHistory();
+  };
+  document.getElementById("objectMass").onchange=e=>{
+    selected.userData.mass=Math.max(0,Number(e.target.value)||0);
+    updateInspector();
+    saveHistory();
+  };
+  document.getElementById("applyTransform").onclick=()=>{
+    const get=label=>Number(box.querySelector(`[data-prop="${label}"]`).value)||0;
+    selected.position.set(get("Position X"),get("Position Y"),get("Position Z"));
+    selected.rotation.set(
+      THREE.MathUtils.degToRad(get("Rotation X")),
+      THREE.MathUtils.degToRad(get("Rotation Y")),
+      THREE.MathUtils.degToRad(get("Rotation Z"))
+    );
+    selected.scale.set(
+      Math.max(.01,get("Scale X")),
+      Math.max(.01,get("Scale Y")),
+      Math.max(.01,get("Scale Z"))
+    );
+    updateInspector();
+    saveHistory();
+  };
+}
+
+function snapshot(){
+  return objects.map(obj=>({
+    type:obj.userData.type,
+    id:obj.userData.id,
+    name:obj.userData.name,
+    description:obj.userData.description,
+    mass:obj.userData.mass,
+    material:obj.userData.material,
+    position:obj.position.toArray(),
+    rotation:obj.rotation.toArray(),
+    scale:obj.scale.toArray()
+  }));
+}
+
+function saveHistory(){
+  const data=JSON.stringify(snapshot());
+  if(history[historyIndex]===data)return;
+  history=history.slice(0,historyIndex+1);
+  history.push(data);
+  if(history.length>40)history.shift();
+  historyIndex=history.length-1;
+}
+
+function restore(data){
+  transform.detach();
+  objects.forEach(o=>scene.remove(o));
+  objects=[];
+  JSON.parse(data).forEach(item=>{
+    const obj=makePart(item.type);
+    obj.userData={...obj.userData,...item};
+    obj.position.fromArray(item.position);
+    obj.rotation.fromArray(item.rotation);
+    obj.scale.fromArray(item.scale);
+    obj.traverse(child=>{
+      if(child.isMesh)child.userData.parentPart=obj;
+    });
+    scene.add(obj);
+    objects.push(obj);
+    serial=Math.max(serial,(item.id||0)+1);
+  });
+  selectObject(null);
+  updateObjectList();
+}
+
+document.getElementById("undoBtn").onclick=()=>{
+  if(historyIndex>0){
+    historyIndex--;
+    restore(history[historyIndex]);
+  }
+};
+document.getElementById("redoBtn").onclick=()=>{
+  if(historyIndex<history.length-1){
+    historyIndex++;
+    restore(history[historyIndex]);
+  }
+};
+
+document.querySelectorAll("[data-mode]").forEach(btn=>{
+  btn.onclick=()=>{
+    document.querySelectorAll("[data-mode]").forEach(b=>b.classList.remove("active"));
+    btn.classList.add("active");
+    transform.setMode(btn.dataset.mode);
+  };
+});
+
+document.getElementById("duplicateBtn").onclick=()=>{
+  if(!selected)return toast("Select an object first");
+  const copy=makePart(selected.userData.type);
+  copy.userData={...selected.userData,id:serial++,name:selected.userData.name+" Copy"};
+  copy.position.copy(selected.position).add(new THREE.Vector3(.5,0,.5));
+  copy.rotation.copy(selected.rotation);
+  copy.scale.copy(selected.scale);
+  copy.traverse(child=>{
+    if(child.isMesh)child.userData.parentPart=copy;
+  });
+  scene.add(copy);
+  objects.push(copy);
+  selectObject(copy);
+  saveHistory();
+};
+
+document.getElementById("deleteBtn").onclick=()=>{
+  if(!selected)return;
+  scene.remove(selected);
+  objects=objects.filter(o=>o!==selected);
+  selectObject(null);
+  saveHistory();
+};
+
+document.getElementById("clearBtn").onclick=()=>{
+  if(!confirm("Clear the entire scene?"))return;
+  transform.detach();
+  objects.forEach(o=>scene.remove(o));
+  objects=[];
+  selectObject(null);
+  updateObjectList();
+  saveHistory();
+};
+
+document.getElementById("addGround").onclick=()=>{
+  createPart("platform");
+};
+
+document.getElementById("saveBtn").onclick=()=>{
+  const project={
+    version:4,
+    objects:snapshot(),
+    serial
+  };
+  localStorage.setItem("weightlab_v4_project",JSON.stringify(project));
+  document.getElementById("saveStatus").textContent="● Project saved locally";
+  toast("Project saved!");
+};
+
+document.getElementById("loadBtn").onclick=()=>{
+  const raw=localStorage.getItem("weightlab_v4_project");
+  if(!raw)return toast("No saved project found");
+  const project=JSON.parse(raw);
+  serial=project.serial||1;
+  restore(JSON.stringify(project.objects||[]));
+  saveHistory();
+  toast("Project loaded!");
+};
+
+document.getElementById("exportBtn").onclick=()=>{
+  renderer.render(scene,camera);
+  const link=document.createElement("a");
+  link.download="weightlab-design.png";
+  link.href=renderer.domElement.toDataURL("image/png");
+  link.click();
+};
+
+function toast(message){
+  const t=document.getElementById("toast");
+  t.textContent=message;
+  t.classList.add("show");
+  setTimeout(()=>t.classList.remove("show"),1800);
+}
+
+document.getElementById("simulateBtn").onclick=()=>{
+  const mass=Math.max(0,Number(document.getElementById("loadInput").value)||0);
+  const stiffness=Math.max(1,Number(document.getElementById("stiffnessInput").value)||1);
+  const force=mass*9.81;
+  const displacement=force/stiffness;
+  const sensorOutput=displacement*2.5;
+
+  document.getElementById("forceValue").textContent=force.toFixed(2)+" N";
+  document.getElementById("displacementValue").textContent=(displacement*1000).toFixed(3)+" mm";
+  document.getElementById("sensorValue").textContent=sensorOutput.toFixed(3)+" mV";
+  toast("Simulation complete");
+};
+
+renderer.domElement.addEventListener("pointerdown",event=>{
+  if(transform.dragging)return;
+  const rect=renderer.domElement.getBoundingClientRect();
+  const mouse=new THREE.Vector2(
+    ((event.clientX-rect.left)/rect.width)*2-1,
+    -((event.clientY-rect.top)/rect.height)*2+1
+  );
+  const raycaster=new THREE.Raycaster();
+  raycaster.setFromCamera(mouse,camera);
+  const hits=raycaster.intersectObjects(objects,true);
+  if(hits.length){
+    let obj=hits[0].object;
+    while(obj.parent&&!objects.includes(obj))obj=obj.parent;
+    if(objects.includes(obj))selectObject(obj);
+  }
+});
+
+function frameAll(){
+  if(!objects.length)return;
+  const box=new THREE.Box3();
+  objects.forEach(o=>box.expandByObject(o));
+  const center=box.getCenter(new THREE.Vector3());
+  const size=box.getSize(new THREE.Vector3()).length();
+  orbit.target.copy(center);
+  camera.position.copy(center).add(new THREE.Vector3(size*.8,size*.65,size*.9));
+  camera.lookAt(center);
+}
+
+function animate(){
+  requestAnimationFrame(animate);
+  orbit.update();
+  renderer.render(scene,camera);
+}
+animate();
+
+window.addEventListener("resize",()=>{
+  const w=container.clientWidth;
+  const h=container.clientHeight;
+  camera.aspect=w/h;
+  camera.updateProjectionMatrix();
+  renderer.setSize(w,h);
+});
+
+createPart("frame",false);
+createPart("platform",false);
+createPart("loadcell",false);
+frameAll();
+saveHistory();
+selectObject(null);
+</script>
+</body>
+</html>
