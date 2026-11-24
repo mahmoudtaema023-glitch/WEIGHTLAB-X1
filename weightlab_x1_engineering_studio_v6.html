@@ -153,14 +153,142 @@ renderer.domElement.addEventListener("pointerdown",e=>{if(gizmo.dragging||e.butt
 window.addEventListener("keydown",e=>{if(["INPUT","SELECT"].includes(document.activeElement.tagName))return;if(e.key==="Delete")$("delete").click();if(e.ctrlKey&&e.key.toLowerCase()==="s"){e.preventDefault();$("save").click()}});
 function resetDynamics(){parts.forEach(o=>{o.position.fromArray(o.userData.initialPosition||[0,1,0]);o.userData.velocity=[0,0,0];o.userData.force=[0,0,0]});simTime=0;samples=[];updateReadouts()}
 function physicsStep(dt){
- const gravity=Number($("gravity").value)||0,air=Math.max(0,Number($("air").value)||0),forces=new Map();
- parts.forEach(o=>{forces.set(o,vec(0,-gravity*o.userData.mass,0).add(vec(...(o.userData.force||[0,0,0]))))});
- links.forEach(l=>{const delta=vec().subVectors(l.b.position,l.a.position),len=delta.length();if(len<1e-8)return;const dir=delta.multiplyScalar(1/len);
-  if(l.type==="spring"){const va=vec(...l.a.userData.velocity),vb=vec(...l.b.userData.velocity),relativeSpeed=vb.sub(va).dot(dir),magnitude=l.k*(len-l.rest)+l.c*relativeSpeed;forces.get(l.a).addScaledVector(dir,magnitude);forces.get(l.b).addScaledVector(dir,-magnitude)}
-  else if(l.type==="fixed"){const relative=vec().subVectors(l.b.position,l.a.position),error=relative.sub(vec(...l.restVector));const correction=error.multiplyScalar(500);forces.get(l.a).add(correction);forces.get(l.b).sub(correction)}
+ const gravity=Number($("gravity").value)||0;
+ const air=Math.max(0,Number($("air").value)||0);
+ const forces=new Map(),bounds=new Map();
+
+ parts.forEach(o=>{
+  forces.set(o,vec(0,-gravity*o.userData.mass,0)
+   .add(vec(...(o.userData.force||[0,0,0]))));
+  o.userData.lastContactForce=0;
  });
- parts.forEach(o=>{if(o.userData.fixed)return;const mass=Math.max(.01,o.userData.mass||1),velocity=vec(...o.userData.velocity),acceleration=forces.get(o).multiplyScalar(1/mass);velocity.addScaledVector(acceleration,dt);velocity.multiplyScalar(Math.max(0,1-air*dt));o.position.addScaledVector(velocity,dt);if(o.position.y<.08){o.position.y=.08;if(velocity.y<0)velocity.y=-velocity.y*.12;velocity.x*=.96;velocity.z*=.96}o.userData.velocity=velocity.toArray();o.userData.force=[0,0,0]});
- links.forEach(l=>{const pA=l.a.position,pB=l.b.position;const attr=l.line.geometry.getAttribute("position");attr.setXYZ(0,pA.x,pA.y,pA.z);attr.setXYZ(1,pB.x,pB.y,pB.z);attr.needsUpdate=true;l.line.geometry.computeBoundingSphere()});
+
+ links.forEach(l=>{
+  const delta=vec().subVectors(l.b.position,l.a.position);
+  const len=delta.length();
+  if(len<1e-8)return;
+  const dir=delta.multiplyScalar(1/len);
+
+  if(l.type==="spring"){
+   const va=vec(...l.a.userData.velocity);
+   const vb=vec(...l.b.userData.velocity);
+   const relativeSpeed=vb.sub(va).dot(dir);
+   const magnitude=l.k*(len-l.rest)+l.c*relativeSpeed;
+   forces.get(l.a).addScaledVector(dir,magnitude);
+   forces.get(l.b).addScaledVector(dir,-magnitude);
+   l.lastForce=Math.abs(magnitude);
+  }
+
+  if(l.type==="fixed"){
+   const error=vec().subVectors(l.b.position,l.a.position)
+    .sub(vec(...l.restVector));
+   const correction=error.multiplyScalar(500);
+   forces.get(l.a).add(correction);
+   forces.get(l.b).sub(correction);
+  }
+ });
+
+ parts.forEach(o=>{
+  if(o.userData.fixed)return;
+  const mass=Math.max(.01,o.userData.mass||1);
+  const velocity=vec(...o.userData.velocity);
+  const acceleration=forces.get(o).multiplyScalar(1/mass);
+  velocity.addScaledVector(acceleration,dt);
+  velocity.multiplyScalar(Math.max(0,1-air*dt));
+  o.position.addScaledVector(velocity,dt);
+  o.userData.velocity=velocity.toArray();
+  o.userData.force=[0,0,0];
+ });
+
+ parts.forEach(o=>{
+  if(o.userData.type==="frame")return;
+  bounds.set(o,new THREE.Box3().setFromObject(o));
+ });
+
+ const restitution=.18,friction=.28;
+
+ for(let i=0;i<parts.length;i++){
+  const a=parts[i],ba=bounds.get(a);
+  if(!ba)continue;
+
+  for(let j=i+1;j<parts.length;j++){
+   const b=parts[j],bb=bounds.get(b);
+   if(!bb)continue;
+
+   const ox=Math.min(ba.max.x,bb.max.x)-Math.max(ba.min.x,bb.min.x);
+   const oy=Math.min(ba.max.y,bb.max.y)-Math.max(ba.min.y,bb.min.y);
+   const oz=Math.min(ba.max.z,bb.max.z)-Math.max(ba.min.z,bb.min.z);
+   if(ox<=0||oy<=0||oz<=0)continue;
+
+   const axis=ox<=oy&&ox<=oz?"x":oy<=oz?"y":"z";
+   const sign=b.position[axis]>=a.position[axis]?1:-1;
+   const normal=vec(axis==="x"?sign:0,axis==="y"?sign:0,axis==="z"?sign:0);
+
+   const invA=a.userData.fixed?0:1/Math.max(.01,a.userData.mass||1);
+   const invB=b.userData.fixed?0:1/Math.max(.01,b.userData.mass||1);
+   const invSum=invA+invB;
+   if(!invSum)continue;
+
+   const penetration=axis==="x"?ox:axis==="y"?oy:oz;
+   const correction=Math.max(0,penetration-.001)*.82/invSum;
+   a.position.addScaledVector(normal,-correction*invA);
+   b.position.addScaledVector(normal,correction*invB);
+
+   const va=vec(...a.userData.velocity);
+   const vb=vec(...b.userData.velocity);
+   const relative=vb.clone().sub(va);
+   const normalSpeed=relative.dot(normal);
+   let impulseMagnitude=0;
+
+   if(normalSpeed<0){
+    impulseMagnitude=-(1+restitution)*normalSpeed/invSum;
+    const impulse=normal.clone().multiplyScalar(impulseMagnitude);
+    va.addScaledVector(impulse,-invA);
+    vb.addScaledVector(impulse,invB);
+
+    const tangent=relative.addScaledVector(normal,-normalSpeed);
+    if(tangent.lengthSq()>1e-10){
+     tangent.normalize();
+     const jt=Math.min(impulseMagnitude*friction,tangent.length()/invSum);
+     va.addScaledVector(tangent,jt*invA);
+     vb.addScaledVector(tangent,-jt*invB);
+    }
+
+    a.userData.velocity=va.toArray();
+    b.userData.velocity=vb.toArray();
+   }
+
+   const contactForce=impulseMagnitude/Math.max(dt,1e-5);
+   a.userData.lastContactForce+=contactForce;
+   b.userData.lastContactForce+=contactForce;
+   ba.setFromObject(a);
+   bb.setFromObject(b);
+  }
+ }
+
+ parts.forEach(o=>{
+  if(o.userData.fixed)return;
+  const box=new THREE.Box3().setFromObject(o);
+  if(box.min.y<0){
+   o.position.y-=box.min.y;
+   const v=vec(...o.userData.velocity);
+   if(v.y<0)v.y=-v.y*restitution;
+   v.x*=1-friction;
+   v.z*=1-friction;
+   o.userData.velocity=v.toArray();
+   o.userData.lastContactForce+=Math.max(0,o.userData.mass||1)*gravity;
+  }
+ });
+
+ links.forEach(l=>{
+  const pA=l.a.position,pB=l.b.position;
+  const attr=l.line.geometry.getAttribute("position");
+  attr.setXYZ(0,pA.x,pA.y,pA.z);
+  attr.setXYZ(1,pB.x,pB.y,pB.z);
+  attr.needsUpdate=true;
+  l.line.geometry.computeBoundingSphere();
+ });
+
  simTime+=dt;
 }
 function makeLink(a,b,type,opts={}){const geo=new THREE.BufferGeometry().setFromPoints([a.position,b.position]),line=new THREE.Line(geo,new THREE.LineBasicMaterial({color:type==="fixed"?0x42dbad:0xffb45e}));scene.add(line);const restVector=b.position.clone().sub(a.position).toArray();links.push({a,b,type,rest:opts.rest??a.position.distanceTo(b.position),restVector:opts.restVector||restVector,k:opts.k??Math.min(a.userData.stiffness||1000,b.userData.stiffness||1000),c:opts.c??12,line});refresh()}
