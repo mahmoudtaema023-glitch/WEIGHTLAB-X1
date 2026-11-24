@@ -36,6 +36,44 @@
 <div class="heading">OBJECT INSPECTOR</div><div id="inspector" class="hint">Select an object to inspect its properties.</div>
 <hr><div class="heading">SIMULATION SETTINGS</div><div class="grid2"><div class="field"><label>Gravity (m/s²)</label><input id="gravity" type="number" step=".1" value="9.81"></div><div class="field"><label>Time scale</label><input id="timescale" type="number" min=".1" max="3" step=".1" value="1"></div><div class="field"><label>Time step (s)</label><input id="step" type="number" min=".001" max=".02" step=".001" value=".005"></div><div class="field"><label>Air damping</label><input id="air" type="number" min="0" max="5" step=".1" value=".08"></div></div>
 <div class="field"><label>Applied force Y (N) on selected object</label><input id="forceY" type="number" value="100"></div><button id="applyForce" style="width:100%">Apply force</button>
+ <hr>
+<div class="heading">⚖️ WEIGHT SIMULATOR</div>
+<div class="field">
+  <label>Virtual test weight (kg)</label>
+  <input id="virtualWeight" type="number" min="0" step="0.01" value="5">
+</div>
+<div class="grid2">
+  <div class="metric"><small>SIMULATED MASS</small><b id="simMass">5.00 kg</b></div>
+  <div class="metric"><small>FORCE</small><b id="simForce">49.05 N</b></div>
+</div>
+<button id="tareWeight" style="width:100%">Tare / Zero</button>
+<p class="hint">Virtual calculation only. Not a real sensor measurement.</p>
+
+<hr>
+<div class="heading">🔌 HARDWARE CONNECTION</div>
+<div class="field">
+  <label>Connection method</label>
+  <select id="connectionType">
+    <option value="serial">USB / Serial</option>
+    <option value="bluetooth">Bluetooth LE</option>
+    <option value="wifi">Wi-Fi bridge</option>
+  </select>
+</div>
+<div class="field" id="wifiField" style="display:none">
+  <label>Wi-Fi WebSocket address</label>
+  <input id="wifiAddress" placeholder="ws://192.168.1.100:8080">
+</div>
+<button id="connectHardware" style="width:100%">Connect hardware</button>
+<button id="disconnectHardware" style="width:100%;margin-top:5px">Disconnect</button>
+<div class="metric" style="margin-top:8px">
+  <small>CONNECTION STATUS</small>
+  <b id="hardwareStatus">Disconnected</b>
+</div>
+<div class="metric" style="margin-top:8px">
+  <small>LIVE HARDWARE READING</small>
+  <b id="hardwareWeight">-- kg</b>
+</div>
+<p class="hint">A compatible device and its communication protocol are required. Not every scale will connect automatically.</p>
 <hr><div class="heading">LIVE ENGINEERING READOUT</div><div class="grid2"><div class="metric"><small>TOTAL MASS</small><b id="totalMass">0 kg</b></div><div class="metric"><small>SIM TIME</small><b id="simTime">0.00 s</b></div><div class="metric"><small>MAX SPEED</small><b id="maxSpeed">0 m/s</b></div><div class="metric"><small>CONNECTIONS</small><b id="linkCount">0</b></div></div><div class="heading">SENSOR TELEMETRY</div><div id="sensors" class="hint">Add sensor components to see modelled readings.</div><canvas id="plot" width="520" height="120"></canvas><p class="hint warn">Educational simulation only. Sensor values are modelled estimates, not physical measurements. This is not a certified structural solver.</p><hr><div class="heading">PROJECT STATUS</div><div id="status" class="status">● Unsaved changes</div>
 </aside>
 </main>
@@ -55,7 +93,7 @@ const fill=new THREE.DirectionalLight(0x438dff,1.2);fill.position.set(-8,7,-9);s
 const floor=new THREE.Mesh(new THREE.PlaneGeometry(300,300),new THREE.MeshStandardMaterial({color:0x101c2b,roughness:.85}));floor.rotation.x=-Math.PI/2;floor.position.y=-.05;floor.receiveShadow=true;scene.add(floor);scene.add(new THREE.GridHelper(60,120,0x456482,0x23374e));
 const gizmo=new TransformControls(camera,renderer.domElement);scene.add(gizmo);
 const mat={steel:new THREE.MeshStandardMaterial({color:0x9aabba,metalness:.85,roughness:.28}),dark:new THREE.MeshStandardMaterial({color:0x34475d,metalness:.7,roughness:.35}),blue:new THREE.MeshStandardMaterial({color:0x147fc8,metalness:.55,roughness:.28}),orange:new THREE.MeshStandardMaterial({color:0xffa64a,metalness:.5,roughness:.32}),rubber:new THREE.MeshStandardMaterial({color:0x171c24,roughness:.9}),copper:new THREE.MeshStandardMaterial({color:0xb66b40,metalness:.8,roughness:.3}),green:new THREE.MeshStandardMaterial({color:0x25a876,metalness:.25,roughness:.4}),glass:new THREE.MeshStandardMaterial({color:0x3b8fae,metalness:.6,roughness:.18})};
-const definitions=[["Frame","frame"],["Platform","platform"],["I-beam","beam"],["Spring","spring"],["Damper","damper"],["Load cell","loadcell"],["Strain gauge","strain"],["Motor","motor"],["Bearing","bearing"],["Shaft","shaft"],["Gear","gear"],["Linear rail","rail"],["Ultrasonic sensor","ultrasonic"],["Optical sensor","optical"],["Pressure sensor","pressure"],["Temperature sensor","temperature"],["Display","display"],["Controller PCB","pcb"],["Enclosure","enclosure"]];
+const definitions=[["Frame","frame"],["Platform","platform"],["Mechanical Lever","lever"],["I-beam","beam"],["Spring","spring"],["Damper","damper"],["Motor","motor"],["Bearing","bearing"],["Shaft","shaft"],["Gear","gear"],["Linear Rail","rail"],["Display","display"],["Controller PCB","pcb"],["Enclosure","enclosure"]];
 const parts=[],links=[],selected=new Set();let nextId=1,running=false,simTime=0,history=[],histIndex=-1,restoring=false,last=performance.now(),accumulator=0,samples=[];
 const vec=(x=0,y=0,z=0)=>new THREE.Vector3(x,y,z);
 function addMesh(g,geometry,material,x=0,y=0,z=0){const m=new THREE.Mesh(geometry,material);m.position.set(x,y,z);m.castShadow=true;m.receiveShadow=true;g.add(m);return m}
@@ -140,6 +178,189 @@ $("duplicate").onclick=()=>{const o=[...selected][0];if(!o)return toast("Select 
 $("delete").onclick=()=>{const targets=[...selected];if(!targets.length)return;targets.forEach(o=>{scene.remove(o);parts.splice(parts.indexOf(o),1)});for(let i=links.length-1;i>=0;i--)if(targets.includes(links[i].a)||targets.includes(links[i].b)){scene.remove(links[i].line);links[i].line.geometry.dispose();links.splice(i,1)}selectOnly(null);checkpoint()};
 $("clear").onclick=()=>{if(!confirm("Clear all components and connections?"))return;parts.forEach(o=>scene.remove(o));links.forEach(l=>{scene.remove(l.line);l.line.geometry.dispose()});parts.length=0;links.length=0;selectOnly(null);checkpoint()};
 $("frame").onclick=()=>{if(!parts.length)return;const bounds=new THREE.Box3();parts.forEach(o=>bounds.expandByObject(o));const center=bounds.getCenter(vec()),size=bounds.getSize(vec()).length()||4;orbit.target.copy(center);camera.position.copy(center).add(vec(size*.8,size*.65,size*.9));camera.lookAt(center)};
+ 
+let virtualTare = 0;
+let serialPort = null;
+let serialReader = null;
+let bluetoothDevice = null;
+let bluetoothCharacteristic = null;
+let wifiSocket = null;
+
+function updateVirtualWeight() {
+  const raw = Number($("virtualWeight").value) || 0;
+  const mass = Math.max(0, raw - virtualTare);
+  $("simMass").textContent = mass.toFixed(2) + " kg";
+  $("simForce").textContent = (mass * 9.81).toFixed(2) + " N";
+}
+
+$("virtualWeight").addEventListener("input", updateVirtualWeight);
+
+$("tareWeight").onclick = () => {
+  virtualTare = Number($("virtualWeight").value) || 0;
+  updateVirtualWeight();
+  toast("Virtual scale zeroed");
+};
+
+$("connectionType").onchange = () => {
+  $("wifiField").style.display =
+    $("connectionType").value === "wifi" ? "block" : "none";
+};
+
+function showHardwareWeight(value) {
+  if (!Number.isFinite(value)) return;
+  $("hardwareWeight").textContent = value.toFixed(3) + " kg";
+}
+
+function parseHardwareData(raw) {
+  try {
+    const data = JSON.parse(raw);
+    const value = Number(
+      data.weight ?? data.value ?? data.mass ?? data.kg
+    );
+    if (Number.isFinite(value)) showHardwareWeight(value);
+  } catch {
+    const value = Number(raw.trim());
+    if (Number.isFinite(value)) showHardwareWeight(value);
+  }
+}
+
+async function connectSerial() {
+  if (!("serial" in navigator)) {
+    throw Error("Web Serial is not supported in this browser");
+  }
+
+  serialPort = await navigator.serial.requestPort();
+  await serialPort.open({ baudRate: 9600 });
+
+  $("hardwareStatus").textContent = "USB / Serial connected";
+
+  const decoder = new TextDecoder();
+  let buffer = "";
+
+  while (serialPort?.readable) {
+    serialReader = serialPort.readable.getReader();
+    try {
+      while (true) {
+        const { value, done } = await serialReader.read();
+        if (done) break;
+        buffer += decoder.decode(value, { stream: true });
+        const lines = buffer.split(/\r?\n/);
+        buffer = lines.pop();
+        lines.forEach(parseHardwareData);
+      }
+    } finally {
+      serialReader.releaseLock();
+      serialReader = null;
+    }
+    break;
+  }
+}
+
+async function connectBluetooth() {
+  if (!navigator.bluetooth) {
+    throw Error("Bluetooth LE is not supported in this browser");
+  }
+
+  bluetoothDevice = await navigator.bluetooth.requestDevice({
+    filters: [{ services: ["weight_scale"] }]
+  });
+
+  bluetoothDevice.addEventListener(
+    "gattserverdisconnected",
+    () => {
+      $("hardwareStatus").textContent = "Bluetooth disconnected";
+    }
+  );
+
+  const server = await bluetoothDevice.gatt.connect();
+  const service = await server.getPrimaryService("weight_scale");
+  bluetoothCharacteristic =
+    await service.getCharacteristic("weight_measurement");
+
+  await bluetoothCharacteristic.startNotifications();
+
+  bluetoothCharacteristic.addEventListener(
+    "characteristicvaluechanged",
+    event => {
+      const data = event.target.value;
+      const flags = data.getUint8(0);
+      const rawWeight = data.getUint16(1, true);
+      let weight = rawWeight * ((flags & 1) ? 0.01 : 0.005);
+
+      if (flags & 1) weight *= 0.45359237;
+
+      showHardwareWeight(weight);
+    }
+  );
+
+  $("hardwareStatus").textContent = "Bluetooth connected";
+}
+
+function connectWifi() {
+  const address = $("wifiAddress").value.trim();
+  if (!address.startsWith("ws://") && !address.startsWith("wss://")) {
+    throw Error("Enter a valid WebSocket address");
+  }
+
+  wifiSocket = new WebSocket(address);
+
+  wifiSocket.onopen = () => {
+    $("hardwareStatus").textContent = "Wi-Fi connected";
+  };
+
+  wifiSocket.onmessage = event => {
+    parseHardwareData(String(event.data));
+  };
+
+  wifiSocket.onerror = () => {
+    $("hardwareStatus").textContent = "Wi-Fi connection error";
+  };
+
+  wifiSocket.onclose = () => {
+    $("hardwareStatus").textContent = "Wi-Fi disconnected";
+  };
+}
+
+$("connectHardware").onclick = async () => {
+  try {
+    $("hardwareStatus").textContent = "Connecting...";
+    const type = $("connectionType").value;
+
+    if (type === "serial") await connectSerial();
+    if (type === "bluetooth") await connectBluetooth();
+    if (type === "wifi") connectWifi();
+
+  } catch (error) {
+    $("hardwareStatus").textContent = "Connection failed";
+    toast(error.message || "Could not connect");
+  }
+};
+
+$("disconnectHardware").onclick = async () => {
+  try {
+    if (serialReader) await serialReader.cancel();
+    if (serialPort) await serialPort.close();
+    if (bluetoothDevice?.gatt?.connected) {
+      bluetoothDevice.gatt.disconnect();
+    }
+    if (wifiSocket) wifiSocket.close();
+  } catch (error) {
+    console.warn(error);
+  }
+
+  serialPort = null;
+  serialReader = null;
+  bluetoothDevice = null;
+  bluetoothCharacteristic = null;
+  wifiSocket = null;
+
+  $("hardwareStatus").textContent = "Disconnected";
+  $("hardwareWeight").textContent = "-- kg";
+  toast("Hardware disconnected");
+};
+
+updateVirtualWeight();
+
 $("undo").onclick=()=>{if(histIndex>0){histIndex--;restore(JSON.parse(history[histIndex]));toast("Undo")}};
 $("redo").onclick=()=>{if(histIndex<history.length-1){histIndex++;restore(JSON.parse(history[histIndex]));toast("Redo")}};
 $("save").onclick=()=>{localStorage.setItem("weightlab_x1_v6",JSON.stringify(projectData()));$("status").textContent="● Saved in this browser";toast("Project saved")};
@@ -302,6 +523,6 @@ function animate(now){requestAnimationFrame(animate);const elapsed=Math.min(.05,
 requestAnimationFrame(animate);
 function resize(){const w=host.clientWidth,h=host.clientHeight;if(!w||!h)return;camera.aspect=w/h;camera.updateProjectionMatrix();renderer.setSize(w,h)}
 new ResizeObserver(resize).observe(host);
-const frame=addPart("frame",false);frame.userData.fixed=true;const base=addPart("platform",false);base.position.set(0,.12,0);base.userData.initialPosition=base.position.toArray();base.userData.fixed=true;addPart("loadcell",false);addPart("motor",false);selectOnly(null);checkpoint();updateReadouts();
+const frame=addPart("frame",false);frame.userData.fixed=true;const base=addPart("platform",false);base.position.set(0,.12,0);base.userData.initialPosition=base.position.toArray();base.userData.fixed=true;addPart("motor",false);selectOnly(null);checkpoint();updateReadouts();
 </script>
 </body></html>
