@@ -298,7 +298,7 @@ $("applyForce").onclick=()=>{const o=[...selected][0];if(!o)return toast("Select
 $("run").onclick=()=>{running=true;$("simstate").textContent="SIMULATION RUNNING";toast("Simulation running")};
 $("pause").onclick=()=>{running=false;$("simstate").textContent="SIMULATION PAUSED";toast("Simulation paused")};
 $("reset").onclick=()=>{running=false;$("simstate").textContent="SIMULATION STOPPED";resetDynamics();toast("Simulation reset")};
-function animate(now){requestAnimationFrame(animate);const elapsed=Math.min(.05,(now-last)/1000);last=now;orbit.update();if(running){accumulator+=elapsed*(Number($("timescale").value)||1);const dt=Math.min(.02,Math.max(.001,Number($("step").value)||.005));let count=0;while(accumulator>=dt&&count<10){physicsStep(dt);accumulator-=dt;count++}samples.push(Math.max(0,...parts.map(o=>vec(...o.userData.velocity).length())));if(samples.length>100)samples.shift();updateReadouts()}renderer.render(scene,camera)}
+function animate(now){requestAnimationFrame(animate);const elapsed=Math.min(.05,(now-last)/1000);last=now;orbit.update();if(running){accumulator+=elapsed*(Number($("timescale").value)||1);const dt=Math.min(.02,Math.max(.001,Number($("step").value)||.005));let count=0;while(accumulator>=dt&&count<30){physicsStep(dt);accumulator-=dt;count++}samples.push(Math.max(0,...parts.map(o=>vec(...o.userData.velocity).length())));if(samples.length>100)samples.shift();updateReadouts()}renderer.render(scene,camera)}
 requestAnimationFrame(animate);
 function resize(){const w=host.clientWidth,h=host.clientHeight;if(!w||!h)return;camera.aspect=w/h;camera.updateProjectionMatrix();renderer.setSize(w,h)}
 new ResizeObserver(resize).observe(host);
