@@ -104,6 +104,38 @@ definitions.forEach(([label,type])=>{const b=document.createElement("button");b.
 $("connect").onclick=connectSelected;$("platform").onclick=()=>addPart("platform");
 document.querySelectorAll("[data-mode]").forEach(b=>b.onclick=()=>{document.querySelectorAll("[data-mode]").forEach(x=>x.classList.remove("active"));b.classList.add("active");gizmo.setMode(b.dataset.mode)});
 gizmo.addEventListener("dragging-changed",e=>orbit.enabled=!e.value);gizmo.addEventListener("mouseUp",()=>{const o=[...selected][0];if(o)o.userData.initialPosition=o.position.toArray();checkpoint();inspect()});
+ let snapEnabled=true,transformSpace="world";
+
+function applySnapSettings(){
+ const step=Number($("snapStep").value)||.25;
+ if(snapEnabled){
+  gizmo.setTranslationSnap(step);
+  gizmo.setRotationSnap(THREE.MathUtils.degToRad(15));
+  gizmo.setScaleSnap(.1);
+ }else{
+  gizmo.setTranslationSnap(null);
+  gizmo.setRotationSnap(null);
+  gizmo.setScaleSnap(null);
+ }
+}
+
+$("snapToggle").onclick=()=>{
+ snapEnabled=!snapEnabled;
+ $("snapToggle").textContent="Snap: "+(snapEnabled?"ON":"OFF");
+ $("snapToggle").classList.toggle("active",snapEnabled);
+ applySnapSettings();
+ toast("Transform snapping "+(snapEnabled?"enabled":"disabled"));
+};
+
+$("snapStep").onchange=applySnapSettings;
+
+$("spaceToggle").onclick=()=>{
+ transformSpace=transformSpace==="world"?"local":"world";
+ gizmo.setSpace(transformSpace);
+ $("spaceToggle").textContent="Space: "+transformSpace.toUpperCase();
+};
+
+applySnapSettings();
 $("duplicate").onclick=()=>{const o=[...selected][0];if(!o)return toast("Select a component");const n=build(o.userData.type);n.userData={...o.userData,id:nextId++,name:o.userData.name+" COPY",velocity:[0,0,0],force:[0,0,0]};n.position.copy(o.position).add(vec(.5,0,.5));n.userData.initialPosition=n.position.toArray();scene.add(n);parts.push(n);selectOnly(n);checkpoint()};
 $("delete").onclick=()=>{const targets=[...selected];if(!targets.length)return;targets.forEach(o=>{scene.remove(o);parts.splice(parts.indexOf(o),1)});for(let i=links.length-1;i>=0;i--)if(targets.includes(links[i].a)||targets.includes(links[i].b)){scene.remove(links[i].line);links[i].line.geometry.dispose();links.splice(i,1)}selectOnly(null);checkpoint()};
 $("clear").onclick=()=>{if(!confirm("Clear all components and connections?"))return;parts.forEach(o=>scene.remove(o));links.forEach(l=>{scene.remove(l.line);l.line.geometry.dispose()});parts.length=0;links.length=0;selectOnly(null);checkpoint()};
