@@ -1,0 +1,585 @@
+<!doctype html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#07111f" />
+    <meta
+      name="description"
+      content="Connect compatible custom scales to WEIGHTLAB X1 through USB serial, Wi-Fi, or Bluetooth LE on your laptop."
+    />
+    <title>Connect Scale | WEIGHTLAB X1</title>
+    <link rel="stylesheet" href="scale.css" />
+    <script src="scale-core.js" defer></script>
+    <script src="scale-app.js" defer></script>
+  </head>
+  <body>
+    <header>
+      <div class="wrap nav">
+        <a class="brand" href="index.html"
+          ><span class="logo">W</span> WEIGHTLAB
+          <span class="accent">X1</span></a
+        >
+        <div class="nav-actions">
+          <a href="index.html#workspace">Back to workspace</a
+          ><button id="language" type="button">العربية</button>
+        </div>
+      </div>
+    </header>
+    <main class="wrap">
+      <div class="page-head">
+        <div>
+          <div
+            class="eyebrow"
+            data-en="HARDWARE / LIVE MEASUREMENTS"
+            data-ar="الأجهزة / القياسات المباشرة"
+          >
+            HARDWARE / LIVE MEASUREMENTS
+          </div>
+          <h1 data-en="Connect your scale." data-ar="وصّل ميزانك.">
+            Connect your scale.
+          </h1>
+          <p
+            data-en="Bring real readings into your engineering workspace. Choose a connection and match the settings to your firmware."
+            data-ar="اعرض القياسات الحقيقية في مساحة العمل. اختر طريقة الاتصال واضبط الإعدادات لتطابق برنامج الميزان."
+          >
+            Bring real readings into your engineering workspace. Choose a
+            connection and match the settings to your firmware.
+          </p>
+        </div>
+        <a
+          class="text-link"
+          href="#setup"
+          data-en="Hardware & setup guide ↓"
+          data-ar="دليل الأجهزة والإعداد ↓"
+          >Hardware & setup guide ↓</a
+        >
+      </div>
+      <div class="compat-banner" id="compatibility" role="status"></div>
+      <div class="workspace">
+        <aside class="panel connection-panel">
+          <div class="panel-head">
+            <h2 data-en="Connection" data-ar="الاتصال">Connection</h2>
+            <span
+              class="muted small"
+              data-en="One device at a time"
+              data-ar="جهاز واحد في كل مرة"
+              >One device at a time</span
+            >
+          </div>
+          <div
+            class="transport-tabs"
+            role="tablist"
+            aria-label="Connection method"
+          >
+            <button
+              id="tab-usb"
+              role="tab"
+              aria-selected="true"
+              aria-controls="settings-usb"
+              data-transport="usb"
+              type="button"
+            >
+              USB serial</button
+            ><button
+              id="tab-wifi"
+              role="tab"
+              aria-selected="false"
+              aria-controls="settings-wifi"
+              data-transport="wifi"
+              tabindex="-1"
+              type="button"
+            >
+              Wi-Fi</button
+            ><button
+              id="tab-ble"
+              role="tab"
+              aria-selected="false"
+              aria-controls="settings-ble"
+              data-transport="ble"
+              tabindex="-1"
+              type="button"
+            >
+              Bluetooth LE
+            </button>
+          </div>
+          <form id="connection-form">
+            <fieldset id="connection-fields">
+              <div id="settings-usb" role="tabpanel" aria-labelledby="tab-usb">
+                <p
+                  class="hint"
+                  data-en="Use a data-capable USB cable. Your scale must expose a serial port; close Arduino Serial Monitor before connecting."
+                  data-ar="استخدم كابل USB لنقل البيانات. يجب أن يظهر الميزان كمنفذ تسلسلي؛ أغلق مراقب Arduino قبل الاتصال."
+                >
+                  Use a data-capable USB cable. Your scale must expose a serial
+                  port; close Arduino Serial Monitor before connecting.
+                </p>
+                <label for="baud" data-en="Baud rate" data-ar="سرعة الاتصال"
+                  >Baud rate</label
+                ><input
+                  id="baud"
+                  type="number"
+                  min="300"
+                  max="4000000"
+                  step="1"
+                  value="115200"
+                  required
+                />
+                <details>
+                  <summary
+                    data-en="Advanced serial settings"
+                    data-ar="إعدادات تسلسلية متقدمة"
+                  >
+                    Advanced serial settings
+                  </summary>
+                  <div class="field-pair">
+                    <div>
+                      <label for="data-bits">Data bits</label
+                      ><select id="data-bits">
+                        <option>8</option>
+                        <option>7</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label for="stop-bits">Stop bits</label
+                      ><select id="stop-bits">
+                        <option>1</option>
+                        <option>2</option>
+                      </select>
+                    </div>
+                  </div>
+                  <label for="parity">Parity</label
+                  ><select id="parity">
+                    <option value="none">None</option>
+                    <option value="even">Even</option>
+                    <option value="odd">Odd</option></select
+                  ><label for="flow">Flow control</label
+                  ><select id="flow">
+                    <option value="none">None</option>
+                    <option value="hardware">Hardware</option>
+                  </select>
+                </details>
+              </div>
+              <div
+                id="settings-wifi"
+                role="tabpanel"
+                aria-labelledby="tab-wifi"
+                hidden
+              >
+                <p
+                  class="hint"
+                  data-en="Connect the laptop and scale to the same network. Enter the endpoint provided by your firmware or local bridge."
+                  data-ar="وصّل الحاسوب والميزان بالشبكة نفسها، وأدخل عنوان البيانات من برنامج الميزان أو الوسيط المحلي."
+                >
+                  Connect the laptop and scale to the same network. Enter the
+                  endpoint provided by your firmware or local bridge.
+                </p>
+                <label for="network-mode">Network protocol</label
+                ><select id="network-mode">
+                  <option value="websocket">WebSocket stream</option>
+                  <option value="http">HTTP JSON polling</option></select
+                ><label
+                  for="endpoint"
+                  data-en="Scale endpoint"
+                  data-ar="عنوان بيانات الميزان"
+                  >Scale endpoint</label
+                ><input
+                  id="endpoint"
+                  type="url"
+                  placeholder="wss://scale.example/weights"
+                  autocomplete="off"
+                  spellcheck="false"
+                />
+                <div id="ws-field">
+                  <label for="ws-framing">WebSocket reading framing</label
+                  ><select id="ws-framing">
+                    <option value="message">
+                      One complete reading per message
+                    </option>
+                    <option value="newline">
+                      Newline-delimited stream (split messages)
+                    </option>
+                  </select>
+                </div>
+                <div id="poll-field" hidden>
+                  <label for="poll-ms">Polling interval (milliseconds)</label
+                  ><input
+                    id="poll-ms"
+                    type="number"
+                    min="250"
+                    max="60000"
+                    step="50"
+                    value="1000"
+                  />
+                </div>
+                <p
+                  class="hint warning"
+                  data-en="An HTTPS website needs WSS or HTTPS with a trusted certificate. Plain ws:// or http:// device endpoints require a locally served HTTP copy. HTTP polling also needs the device to allow your website origin with CORS."
+                  data-ar="يتطلب موقع HTTPS عنوان WSS أو HTTPS بشهادة موثوقة. العناوين غير المشفرة تحتاج نسخة محلية عبر HTTP. ويجب أن يسمح الجهاز بمصدر الموقع عبر CORS عند الاستقصاء."
+                >
+                  An HTTPS website needs WSS or HTTPS with a trusted
+                  certificate. Plain ws:// or http:// device endpoints require a
+                  locally served HTTP copy. HTTP polling also needs the device
+                  to allow your website origin with CORS.
+                </p>
+              </div>
+              <div
+                id="settings-ble"
+                role="tabpanel"
+                aria-labelledby="tab-ble"
+                hidden
+              >
+                <p
+                  class="hint"
+                  data-en="Bluetooth LE requires matching GATT identifiers. Bluetooth Classic is not BLE; an OS-paired serial device may work through the USB serial tab."
+                  data-ar="يتطلب Bluetooth LE معرّفات GATT مطابقة. البلوتوث التقليدي ليس BLE؛ قد يعمل جهاز تسلسلي مقترن بالنظام من تبويب USB."
+                >
+                  Bluetooth LE requires matching GATT identifiers. Bluetooth
+                  Classic is not BLE; an OS-paired serial device may work
+                  through the USB serial tab.
+                </p>
+                <label for="ble-preset">BLE profile</label
+                ><select id="ble-preset">
+                  <option value="uart">Nordic UART / text</option>
+                  <option value="standard">
+                    Standard Weight Scale Service
+                  </option>
+                  <option value="custom">
+                    Custom text / JSON service
+                  </option></select
+                ><label for="ble-service">Service UUID</label
+                ><input
+                  id="ble-service"
+                  value="6e400001-b5a3-f393-e0a9-e50e24dcca9e"
+                  spellcheck="false"
+                /><label for="ble-characteristic"
+                  >Measurement characteristic UUID</label
+                ><input
+                  id="ble-characteristic"
+                  value="6e400003-b5a3-f393-e0a9-e50e24dcca9e"
+                  spellcheck="false"
+                /><label for="ble-framing">Text notification framing</label
+                ><select id="ble-framing">
+                  <option value="packet">
+                    One complete reading per notification
+                  </option>
+                  <option value="newline">
+                    Newline-delimited stream (fragmented packets)
+                  </option>
+                </select>
+                <p class="hint">
+                  UUIDs accept a full 128-bit value or 0x181d-style short
+                  identifiers. The measurement characteristic must notify or
+                  indicate.
+                </p>
+              </div>
+              <details class="format-settings" open>
+                <summary data-en="Reading format" data-ar="صيغة القياسات">
+                  Reading format
+                </summary>
+                <label for="format">Input format</label
+                ><select id="format">
+                  <option value="auto">Auto: text or JSON</option>
+                  <option value="text">Number / scale text</option>
+                  <option value="json">JSON object</option></select
+                ><label for="input-unit"
+                  >Default input unit (when omitted)</label
+                ><select id="input-unit">
+                  <option value="g">Grams (g)</option>
+                  <option value="kg">Kilograms (kg)</option>
+                  <option value="mg">Milligrams (mg)</option>
+                  <option value="lb">Pounds (lb)</option>
+                  <option value="oz">Ounces (oz)</option></select
+                ><label for="json-key"
+                  >JSON weight field (dot paths supported)</label
+                ><input
+                  id="json-key"
+                  placeholder="Auto: weight, value, or grams"
+                  autocomplete="off"
+                  spellcheck="false"
+                />
+                <p class="hint">
+                  Examples: <code>123.45 g</code> or
+                  <code>{"weight":123.45,"unit":"g","stable":true}</code>. USB
+                  readings must end with a newline. Standard BLE weight
+                  measurements use their own binary unit flags.
+                </p>
+              </details>
+            </fieldset>
+            <p class="hint">
+              A successful new connection or demo starts a fresh session. Export
+              existing readings first. Supported measurements: ±1 trillion
+              grams.
+            </p>
+            <div class="connection-actions">
+              <button
+                class="primary"
+                id="connect"
+                type="submit"
+                data-en="Connect scale"
+                data-ar="اتصل بالميزان"
+              >
+                Connect scale</button
+              ><button
+                id="disconnect"
+                type="button"
+                disabled
+                data-en="Disconnect"
+                data-ar="قطع الاتصال"
+              >
+                Disconnect
+              </button>
+            </div>
+          </form>
+          <div
+            class="connection-message"
+            id="message"
+            role="status"
+            aria-live="polite"
+          ></div>
+        </aside>
+        <div class="measurement-column">
+          <section class="panel live-panel" aria-labelledby="live-title">
+            <div class="panel-head">
+              <h2
+                id="live-title"
+                data-en="Live measurement"
+                data-ar="القياس المباشر"
+              >
+                Live measurement
+              </h2>
+              <span class="status" id="status" data-state="disconnected"
+                >Disconnected</span
+              >
+            </div>
+            <div class="source-row">
+              <span id="source">No physical scale connected</span
+              ><span id="last-updated">No readings yet</span>
+            </div>
+            <div class="weight-display">
+              <output id="weight" aria-label="Latest scale reading">—</output
+              ><select id="display-unit" aria-label="Display weight unit">
+                <option value="g">g</option>
+                <option value="kg">kg</option>
+                <option value="mg">mg</option>
+                <option value="lb">lb</option>
+                <option value="oz">oz</option>
+              </select>
+            </div>
+            <div id="measurement-state" class="measurement-state">
+              Waiting for a device
+            </div>
+            <div class="reading-stats">
+              <div>
+                <span data-en="Gross weight" data-ar="الوزن الإجمالي"
+                  >Gross weight</span
+                ><strong id="gross">—</strong>
+              </div>
+              <div>
+                <span data-en="Software tare" data-ar="التصفير البرمجي"
+                  >Software tare</span
+                ><strong id="tare-value">0 g</strong>
+              </div>
+              <div>
+                <span data-en="Readings captured" data-ar="القراءات المسجلة"
+                  >Readings captured</span
+                ><strong id="reading-count">0</strong>
+              </div>
+            </div>
+            <div class="toolbar">
+              <button
+                id="tare"
+                type="button"
+                disabled
+                data-en="Tare display"
+                data-ar="صفّر الشاشة"
+              >
+                Tare display</button
+              ><button
+                id="reset-tare"
+                type="button"
+                disabled
+                data-en="Reset tare"
+                data-ar="إلغاء التصفير"
+              >
+                Reset tare</button
+              ><button
+                id="export"
+                type="button"
+                disabled
+                data-en="Export CSV"
+                data-ar="تصدير CSV"
+              >
+                Export CSV</button
+              ><button
+                id="clear"
+                type="button"
+                disabled
+                data-en="Clear session"
+                data-ar="مسح الجلسة"
+              >
+                Clear session
+              </button>
+            </div>
+            <p
+              class="hint"
+              data-en="Tare changes this display only. It does not send commands to the device or calibrate the sensor. Readings stay on this laptop; CSV export saves them to a file."
+              data-ar="يغيّر التصفير هذه الشاشة فقط، ولا يرسل أوامر للجهاز أو يعاير المستشعر. تبقى القراءات على الحاسوب ويمكن تصديرها إلى ملف CSV."
+            >
+              Tare changes this display only. It does not send commands to the
+              device or calibrate the sensor. Readings stay on this laptop; CSV
+              export saves them to a file.
+            </p>
+          </section>
+          <section class="panel chart-panel" aria-labelledby="trend-title">
+            <div class="panel-head">
+              <h2
+                id="trend-title"
+                data-en="Recent readings"
+                data-ar="القراءات الأخيرة"
+              >
+                Recent readings
+              </h2>
+              <span class="small muted">Last 240 points · net grams</span>
+            </div>
+            <div class="chart-wrap">
+              <canvas
+                id="chart"
+                aria-label="Line plot of recent net weight readings in grams"
+              ></canvas>
+              <div
+                id="chart-empty"
+                data-en="Your measurements will appear here."
+                data-ar="ستظهر قياساتك هنا."
+              >
+                Your measurements will appear here.
+              </div>
+            </div>
+          </section>
+          <details class="panel diagnostics">
+            <summary data-en="Connection diagnostics" data-ar="تشخيص الاتصال">
+              Connection diagnostics
+            </summary>
+            <p class="hint">
+              Last received packet: <code id="last-packet">—</code>
+            </p>
+            <p class="hint">
+              Invalid packets ignored: <strong id="invalid-count">0</strong>
+            </p>
+            <pre id="log" aria-label="Recent connection events">
+Ready. No device connected.</pre
+            >
+          </details>
+          <div class="demo-panel">
+            <div>
+              <strong data-en="No hardware yet?" data-ar="لا يوجد جهاز بعد؟"
+                >No hardware yet?</strong
+              >
+              <p
+                data-en="Try explicitly simulated readings to explore the interface."
+                data-ar="جرّب قراءات محاكاة واضحة لاستكشاف الواجهة."
+              >
+                Try explicitly simulated readings to explore the interface.
+              </p>
+            </div>
+            <button
+              id="demo"
+              type="button"
+              data-en="Try demo"
+              data-ar="جرّب المحاكاة"
+            >
+              Try demo
+            </button>
+          </div>
+        </div>
+      </div>
+      <section id="setup" class="setup-section">
+        <div class="eyebrow">HARDWARE / COMPATIBILITY</div>
+        <h2
+          data-en="A shared interface. Different boards."
+          data-ar="واجهة مشتركة، ولوحات مختلفة."
+        >
+          A shared interface. Different boards.
+        </h2>
+        <p class="muted">
+          Choose firmware that sends calibrated weight readings in the supported
+          format. A connection cannot add a radio that your board does not have
+          or interpret an unknown proprietary protocol.
+        </p>
+        <div class="setup-grid">
+          <article class="panel">
+            <h3>ESP32 family</h3>
+            <p>
+              Use USB serial plus Wi-Fi and BLE where your exact chip supports
+              them. Not every ESP32 variant has both wireless radios. Configure
+              a text-notification service or a secure network endpoint.
+            </p>
+          </article>
+          <article class="panel">
+            <h3>Arduino boards</h3>
+            <p>
+              Classic Uno/Nano boards can send newline-delimited measurements
+              over USB serial. Wi-Fi and BLE require compatible add-on modules
+              or a board with those radios built in.
+            </p>
+          </article>
+          <article class="panel">
+            <h3>Raspberry Pi & other scales</h3>
+            <p>
+              A Pi can expose a network endpoint or act as a bridge. USB gadget
+              and BLE peripheral modes need specific configuration. Proprietary
+              USB HID, binary, or vendor protocols require a matching adapter.
+            </p>
+          </article>
+        </div>
+        <details class="panel setup-details">
+          <summary>Before you connect</summary>
+          <p>
+            Use a current Chrome or Edge on your laptop and check the capability
+            banner above. Bluetooth support depends on your OS and adapter;
+            Linux support can differ. Open the actual website in a normal
+            browser tab: an embedded preview may block hardware permissions.
+          </p>
+          <p>
+            USB: match baud/settings, select the scale in the browser chooser,
+            and send one reading per line. BLE: use the measurement service and
+            characteristic from your firmware. Wi-Fi: use your device's network
+            endpoint, not the public website URL; HTTPS pages require trusted
+            TLS, and HTTP polling requires CORS. Browser local-network
+            permission may also be needed.
+          </p>
+          <p>
+            Read the
+            <a class="text-link" href="SCALE_SETUP.md"
+              >full firmware and setup guide</a
+            >
+            for hardware-specific notes. These are software adapters, not proof
+            of scale accuracy or certification.
+          </p>
+          <p>
+            References:
+            <a
+              class="text-link"
+              href="https://developer.chrome.com/docs/capabilities/serial"
+              target="_blank"
+              rel="noopener"
+              >Web Serial</a
+            >
+            ·
+            <a
+              class="text-link"
+              href="https://developer.mozilla.org/en-US/docs/Web/API/Web_Bluetooth_API"
+              target="_blank"
+              rel="noopener"
+              >Web Bluetooth</a
+            >
+          </p>
+        </details>
+      </section>
+    </main>
+    <footer class="wrap">
+      WEIGHTLAB X1 · Physical readings are separate from design simulations.
+      Hardware testing and calibration are still required.
+    </footer>
+  </body>
+</html>
